@@ -6192,4 +6192,4 @@ end
 library.AddWindow = library.CreateWindow
 library.Window = library.CreateWindow
 library.W = library.CreateWindow
-return
+return library
