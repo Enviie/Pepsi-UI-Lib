@@ -92,27 +92,27 @@ Library [
                 AddTextbox: Function (
                     (table) Options [
                         (string) Name = "Textbox Name"
-                        (string | nil) Flag = "FlagName"
                         (string | number) Value = "String" or 1337
-                        (string | nil) Placeholder = "Text to display by default"
                         (function | nil) Callback = Function (NewValue, OldValue)
+                        (string | nil) Flag = "FlagName"
                         (table | nil) Location = Table
                         (string | nil) LocationFlag = "LocationFlag"
+                        (any) UnloadValue = UnloadValue
+                        (function | nil) UnloadFunc = Function
+                        (string | nil) Placeholder = "Text to display by default"
                         (string | nil) Type = "number"
+                        (number | nil) Min = 0
+                        (number | nil) Max = 100
+                        (number | nil) Decimals/Precision/Precise = 2
                         (boolean | nil) Hex = true or false
                         (boolean | nil) Binary = true or false
                         (number | nil) Base = 10
-                        (number | nil) Decimals/Precision/Precise = 2
-                        (number | nil) Min = 0
-                        (number | nil) Max = 100
                         (boolean | nil) Rich/RichText/RichTextBox = true or false
                         (boolean | nil) Lines/MultiLine = true or false
                         (boolean | nil) Scaled/TextScaled = true or false
                         (EnumItem | nil) Font/TextFont = Enum.Font.Code
                         (function | nil) PreFormat = Function (Value)
                         (function | nil) PostFormat = Function (Value)
-                        (any) UnloadValue = UnloadValue
-                        (function | nil) UnloadFunc = Function
                         (table | nil) CustomProperties = Properties [
                         	TextTruncate = Enum.TextTruncate.None
                         ]
@@ -133,18 +133,18 @@ Library [
                 AddSlider: Function (
                     (table) Options [
                         (string) Name = "Slider Name"
-                        (string | nil) Flag = "FlagName"
-                        (number) Min = 0
-                        (number) Max = 100
                         (number | nil) Value = 0
+                        (function | nil) Callback = Function (Value, OldValue)
+                        (string | nil) Flag = "FlagName"
                         (table | nil) Location = Table
                         (string | nil) LocationFlag = "LocationFlag"
-                        (function | nil) Callback = Function (Value, OldValue)
+                        (any) UnloadValue = UnloadValue
+                        (function | nil) UnloadFunc = Function
+                        (number) Min = 0
+                        (number) Max = 100
                         (number | nil) Decimals/Precision/Precise = 2
                         (string | function | nil) Format = "Value %s" | Function (Value, LastValue)
                         (boolean | nil) IllegalInput = true or false // Allow textbox to break min & max limits
-                        (any) UnloadValue = UnloadValue
-                        (function | nil) UnloadFunc = Function
                         (boolean | table | nil) Textbox/InputBox/CustomInput = true | Options [
                             (boolean | nil) Hex = true or false
                             (boolean | nil) Binary = true or false
@@ -198,15 +198,15 @@ Library [
                 AddKeybind: Function (
                     (table) Options [
                         (string) Name = "Keybind Name"
-                        (string | nil) Flag = "FlagName"
                         (EnumItem | nil) Value = Enum.KeyCode.F
+                        (function | nil) Callback = Function (NewValue, OldValue)
+                        (string | nil) Flag = "FlagName"
                         (table | nil) Location = Table
                         (string | nil) LocationFlag = "LocationFlag"
-                        (function | nil) Callback = Function (NewValue, OldValue)
-                        (function | nil) Pressed = Function (InputObject, GameProcessed)
-                        (table | nil) KeyNames = Table
                         (any) UnloadValue = UnloadValue
                         (function | nil) UnloadFunc = Function
+                        (function | nil) Pressed = Function (InputObject, GameProcessed)
+                        (table | nil) KeyNames = Table
                     ]
                 ) -> Keybind [
                     Options: Table
@@ -222,21 +222,14 @@ Library [
                 AddDropdown: Function (
                     (table) Options [
                         (string) Name = "Dropdown Name"
-                        (string | nil) Flag = "FlagName"
-                        (table | Instance | Enum) List = Table | workspace | Enum.Font
-                        (string | nil) BlankValue/NoValueString/Nothing = "No Selection"
                         (any) Value = Value
-                        (boolean | function | nil) Sort = true or false | Function
+                        (function | nil) Callback = Function (NewValue, LastValue)
+                        (string | nil) Flag = "FlagName"
                         (table | nil) Location = Table
                         (string | nil) LocationFlag = "LocationFlag"
-                        (function | nil) Callback = Function (NewValue, LastValue)
-                        (boolean | string | nil) Multi/Multiple/MultiSelect = true or false | "Text to display"
-                        (function | nil) ItemAdded/AddedCallback = Function (Item, AllItems)
-                        (function | nil) ItemRemoved/RemovedCallback = Function (Item, AllItems)
-                        (function | nil) ItemsCleared/ClearedCallback = Function (Items, PreviousItems)
-                        (function | nil) ItemChanged/ChangedCallback = Function (Item, SelectedState, Items)
                         (any) UnloadValue = UnloadValue
                         (function | nil) UnloadFunc = Function
+                        (table | Instance | Enum) List = Table | workspace | Enum.Font
                         (string | function | table | nil) Filter = "StringToMatch" | Function (ValueToCheck) | Table [
                             (boolean | nil) [0] = InverseBool
                             (any) [1] ... = "StringToMatch" | Enum.Font.Code/ValuesToMatch
@@ -245,6 +238,17 @@ Library [
                         	(string | function) [1/Method] = "GetFriendsOnline" | Player.GetFriendsOnline
                         	(any) [1/2/Args/Arguments] ... = 50
                         ]
+                        (string | nil) BlankValue/NoValueString/Nothing = "No Selection"
+                        (boolean | function | nil) Sort = true or false | Function
+                        (boolean | string | nil) Multi/Multiple/MultiSelect = true or false | "Text to display"
+                        (function | nil) ItemAdded/AddedCallback = Function (Item, AllItems)
+                        (function | nil) ItemRemoved/RemovedCallback = Function (Item, AllItems)
+                        (function | nil) ItemChanged/ChangedCallback = Function (Item, SelectedState, Items)
+                        (function | nil) ItemsCleared/ClearedCallback = Function (Items, PreviousItems)
+						(EnumItem/Keycode | nil) ScrollUpButton = Enum.KeyCode.Up // Default is Enum.KeyCode.Up
+						(EnumItem/Keycode | nil) ScrollDownButton = Enum.KeyCode.Down // Default is Enum.KeyCode.Down
+						(number | nil) ScrollButtonRate / ScrollRate = 5 // How fast the scroller goes by pressing the scroll buttons
+						(bool | nil) DisablePrecisionScrolling = true or false // Dissallows use of keys to control pan
                     ]
                 ) -> Dropdown [
                     Options: Table
@@ -265,22 +269,14 @@ Library [
                 AddSearchBox: Function (
                     (table) Options [
                         (string) Name = "SearchBox Name"
-                        (string | nil) Flag = "FlagName"
-						(boolean | nil) RegEx = true or false // Enables use of %d and %w, etc (False by default)
-                        (table | Instance | Enum) List = Table | workspace | Enum.Font
-                        (string | nil) BlankValue/NoValueString/Nothing = "No Selection"
                         (any) Value = Value
-                        (boolean | function | nil) Sort = true or false | Function
+                        (function | nil) Callback = Function (NewValue, LastValue)
+                        (string | nil) Flag = "FlagName"
                         (table | nil) Location = Table
                         (string | nil) LocationFlag = "LocationFlag"
-                        (function | nil) Callback = Function (NewValue, LastValue)
-                        (boolean | string | nil) Multi/Multiple/MultiSelect = true or false | "Text to display"
-                        (function | nil) ItemAdded/AddedCallback = Function (Item, AllItems)
-                        (function | nil) ItemRemoved/RemovedCallback = Function (Item, AllItems)
-                        (function | nil) ItemsCleared/ClearedCallback = Function (Items, PreviousItems)
-                        (function | nil) ItemChanged/ChangedCallback = Function (Item, SelectedState, Items)
                         (any) UnloadValue = UnloadValue
                         (function | nil) UnloadFunc = Function
+                        (table | Instance | Enum) List = Table | workspace | Enum.Font
                         (string | function | table | nil) Filter = "StringToMatch" | Function (ValueToCheck) | Table [
                             (boolean | nil) [0] = InverseBool
                             (string | any | nil) [1] ... = "StringToMatch" | Enum.Font.Code
@@ -289,6 +285,18 @@ Library [
                         	(string | function) [1/Method] = "GetFriendsOnline" | Player.GetFriendsOnline
                         	(any) [1/2/Args/Arguments] ... = 50
                         ]
+                        (boolean | function | nil) Sort = true or false | Function
+                        (string | nil) BlankValue/NoValueString/Nothing = "No Selection"
+                        (boolean | string | nil) Multi/Multiple/MultiSelect = true or false | "Text to display"
+                        (function | nil) ItemAdded/AddedCallback = Function (Item, AllItems)
+                        (function | nil) ItemRemoved/RemovedCallback = Function (Item, AllItems)
+                        (function | nil) ItemChanged/ChangedCallback = Function (Item, SelectedState, Items)
+                        (function | nil) ItemsCleared/ClearedCallback = Function (Items, PreviousItems)
+						(EnumItem/Keycode | nil) ScrollUpButton = Enum.KeyCode.Up // Default is Enum.KeyCode.Up
+						(EnumItem/Keycode | nil) ScrollDownButton = Enum.KeyCode.Down // Default is Enum.KeyCode.Down
+						(number | nil) ScrollButtonRate / ScrollRate = 5 // How fast the scroller goes by pressing the scroll buttons
+						(bool | nil) DisablePrecisionScrolling = true or false // Dissallows use of keys to control pan
+						(boolean | nil) RegEx = true or false // Enables use of %d and %w, etc (False by default)
                     ]
                 ) -> SearchBox [
                     Options: Table
@@ -310,14 +318,14 @@ Library [
                     (table) Options [
                         (string) Name = "Colorpicker Name"
                         (string | Color3 | nil) Value = "rainbow" or "random" | Color3.new()
+                        (function | nil) Callback = Function (NewValue, LastValue)
                         (string | nil) Flag = "FlagName"
-                        (boolean | nil) Random = true or false
-                        (boolean | nil) Rainbow = true or false
                         (table | nil) Location = Table
                         (string | nil) LocationFlag = "LocationFlag"
-                        (function | nil) Callback = Function (NewValue, LastValue)
                         (any) UnloadValue = UnloadValue
                         (function | nil) UnloadFunc = Function
+                        (boolean | nil) Rainbow = true or false
+                        (boolean | nil) Random = true or false
                     ]
                 ) -> Colorpicker [
                     Options: Table
@@ -338,20 +346,24 @@ Library [
                 AddPersistence: Function (
                     (table) Options [
                         (string) Name = "Persistence Name"
-                        (string | nil) Workspace = "FolderName"
-                        (string | nil) Flag = "FlagName"
                         (string | nil) Value = "FileName"
+                        (function | nil) Callback = Function (NewValue, LastValue)
+                        (string | nil) Flag = "FlagName"
                         (table | nil) Location = Table
                         (string | nil) LocationFlag = "LocationFlag"
+                        (any) UnloadValue = UnloadValue
+                        (function | nil) UnloadFunc = Function
+                        (string | nil) Workspace = "FolderName"
+                        (boolean | string | number | table | nil) Persistive/Flags = true | "all" | 1 (Window) or 2 (Tab) or 3 (Section) | FlagNames [...]
                         (string | nil) Suffix = "Mods"
-                        (function | nil) Callback = Function (NewValue, LastValue)
-                        (function | nil) LoadCallback = Function (FilePath, FileName)
+                        (function | nil) LoadCallback = Function (FilePath, FileName) // 'PreLoad'
                         (function | nil) SaveCallback = Function (FilePath, FileName)
                         (function | nil) PostLoadCallback = Function (FilePath, FileName)
                         (function | nil) PostSaveCallback = Function (FilePath, FileName)
-                        (boolean | string | number | table | nil) Persistive/Flags = true | "all" | 1 (Window) or 2 (Tab) or 3 (Section) | FlagNames [...]
-                        (any) UnloadValue = UnloadValue
-                        (function | nil) UnloadFunc = Function
+						(EnumItem/Keycode | nil) ScrollUpButton = Enum.KeyCode.Up // Default is Enum.KeyCode.Up
+						(EnumItem/Keycode | nil) ScrollDownButton = Enum.KeyCode.Down // Default is Enum.KeyCode.Down
+						(number | nil) ScrollButtonRate / ScrollRate = 5 // How fast the scroller goes by pressing the scroll buttons
+						(bool | nil) DisablePrecisionScrolling = true or false // Dissallows use of keys to control pan
                     ]
                 ) -> Persistence [
                     Options: Table
@@ -365,15 +377,24 @@ Library [
 					RawSet: Function (NewValue) -> NewValue // Sets value without firing callback
                     Reset: Function -> DefaultFile
                     Get: Function -> CurrentValue
+					SaveFile: Function (FileName) // Mimics the Save Button with optional file input
+					LoadFile: Function (FileName) // Mimics the Load Button with optional file input
+					LoadJSON: Function (JSON) // Mimics the Load Button with specific json
+					GetJSON: Function (Func) // Gets the json, and passes it as the first argument of Func. Set to true to use setclipboard
                 ]
             ]
             Flags: Table
         ]
         CreateDesigner: Function (
             (table) Options [
+				(string | number | table | nil) Background/Backdrop/Grahpic = "rbxassetid://13337" | 13337 | Options [
+					(string | number | nil) 1/Asset = "rbxassetid://13337" | 13337
+					(number | nil) 2/Transparency = 0.5 | 50 // Both examples will make the backdrop half visible
+					(boolean | number | nil) 3/Visible = true or false | 1 or 0 // 1: true, 0: false
+				]
                 (string | number | nil) Image = "rbxassetid://7483871523" | 7483871523
-                (boolean | nil) Credit = true
                 (string | table | nil) Info = "Extra info displayed in designer" | Lines ["line 1", "line 2", "line 3", "and so on..."]
+                (boolean | nil) Credit = true
             ]
         ) -> Designer [
             Options: Table
@@ -398,9 +419,12 @@ Library [
     Players: game.Players
     Mouse: LP:GetMouse()
     Unload: Function
+	signals: Table // All :connection()'s go in that table, and are disconnected upon unloading the gui. Feel free to add yours here, too
     (function | nil) UnloadCallback = Function
+	(EnumItem/Keycode | nil) scrollupbutton = Enum.KeyCode.Up // Default is Enum.KeyCode.Up
+	(EnumItem/Keycode | nil) scrolldownbutton = Enum.KeyCode.Down // Default is Enum.KeyCode.Down
     Subs: Shared Functions [
-		updatecolors: Function
+		updatecolors: Function // Re-Applys all colors from designer
 		Wait: Function (Time) // Only waits & returns true if the library has not been unloaded
 		removeSpaces: Function (String)
 		Color3ToHex: Function (Color3)
@@ -411,7 +435,7 @@ Library [
 ]
 ]]
 local library = {
-	Version = 0.16,
+	Version = 0.18,
 	WorkspaceName = "Pepsi Lib",
 	flags = {},
 	signals = {},
@@ -501,9 +525,37 @@ library.subs.Wait, library.subs.wait = wait_check, wait_check
 local lasthidebing = 0
 local temp = game:FindService("MarketplaceService") or game:GetService("MarketplaceService")
 local Marketplace = (temp and (cloneref and cloneref(temp))) or temp
-temp = nil
+local resolvevararg, temp = nil
 function library.defaultSort(a, b)
 	return tostring(b):lower() > tostring(a):lower()
+end
+do
+	local varargresolve = {
+		Window = {"Name", "Theme"},
+		Tab = {"Name", "Image"},
+		Section = {"Name", "Side"},
+		Label = {"Text", "Flag", "UnloadValue", "UnloadFunc"},
+		Toggle = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Locked", "Keybind", "Condition"},
+		Textbox = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Placeholder", "Type", "Min", "Max", "Decimals", "Hex", "Binary", "Base", "RichTextBox", "MultiLine", "TextScaled", "TextFont", "PreFormat", "PostFormat", "CustomProperties"},
+		Slider = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Min", "Max", "Decimals", "Format", "IllegalInput", "Textbox"},
+		Button = {"Name", "Callback", "Locked", "Condition"},
+		Keybind = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Pressed", "KeyNames"},
+		Dropdown = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "List", "Filter", "Method", "Nothing", "Sort", "MultiSelect", "ItemAdded", "ItemRemoved", "ItemChanged", "ItemsCleared", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling"},
+		SearchBox = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "List", "Filter", "Method", "Nothing", "Sort", "MultiSelect", "ItemAdded", "ItemRemoved", "ItemChanged", "ItemsCleared", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling", "RegEx"},
+		Colorpicker = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Rainbow", "Random"},
+		Persistence = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Workspace", "Persistive", "Suffix", "LoadCallback", "SaveCallback", "PostLoadCallback", "PostSaveCallback", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling"},
+		Designer = {"Backdrop", "Image", "Info", "Credit"}
+	}
+	function resolvevararg(objtype, ...)
+		local data = varargresolve[objtype]
+		local t = {}
+		if data then
+			for index, value in pairs({...}) do
+				t[data[index]] = value
+			end
+		end
+		return t
+	end
 end
 local resolvercache = {}
 library.resolvercache = resolvercache
@@ -706,7 +758,7 @@ local keyHandler = {
 		[Enum.KeyCode.Backquote] = "`"
 	}
 }
-function shared.unloadall()
+local function unloadall()
 	if shared.libraries then
 		local b = 50
 		while #shared.libraries > 0 do
@@ -717,7 +769,7 @@ function shared.unloadall()
 			end
 			local v = shared.libraries[1]
 			if v and v.unload and type(v.unload) == "function" then
-				if not pcall(v) then
+				if not pcall(v.unload) then
 					for k in pairs(v) do
 						v[k] = nil
 					end
@@ -728,6 +780,8 @@ function shared.unloadall()
 	end
 	shared.libraries = nil
 end
+shared.unloadall = unloadall
+library.unloadall = unloadall
 shared.libraries[1 + #shared.libraries] = library
 function library.unload()
 	__runscript = nil
@@ -916,7 +970,7 @@ if not mouse and PluginManager and runService:IsStudio() then
 	library.plugin = shared.library_plugin
 end
 library.Mouse = mouse
-function textToSize(object)
+local function textToSize(object)
 	if object ~= nil then
 		local output = textService:GetTextSize(object.Text, object.TextSize, object.Font, Vector2.new(math.huge, math.huge))
 		return {
@@ -926,14 +980,14 @@ function textToSize(object)
 	end
 end
 library.subs.textToSize = textToSize
-function removeSpaces(str)
+local function removeSpaces(str)
 	if str then
 		local newStr = str:gsub(" ", "")
 		return newStr
 	end
 end
 library.subs.removeSpaces = removeSpaces
-function Color3FromHex(hex)
+local function Color3FromHex(hex)
 	hex = hex:gsub("#", ""):upper():gsub("0X", "")
 	return Color3.fromRGB(tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16))
 end
@@ -960,7 +1014,7 @@ if Color3.ToHex and not shared.overridecolortohex then
 end
 library.subs.Color3ToHex = Color3ToHex
 local isDraggingSomething = false
-function makeDraggable(topBarObject, object)
+local function makeDraggable(topBarObject, object)
 	local dragging = nil
 	local dragInput = nil
 	local dragStart = nil
@@ -996,23 +1050,27 @@ function makeDraggable(topBarObject, object)
 	end)
 end
 library.subs.makeDraggable = makeDraggable
-local temp_http = game:FindService("HttpService") or game:GetService("HttpService")
-local httpservice = temp_http
-if syn and cloneref and type(cloneref) == "function" then
-	httpservice, temp_http = cloneref(httpservice), nil
+local JSONEncode, JSONDecode = nil, nil
+do
+	local temp_http = game:FindService("HttpService") or game:GetService("HttpService")
+	local httpservice = temp_http
+	if cloneref and type(cloneref) == "function" then
+		httpservice, temp_http = cloneref(httpservice), nil
+	end
+	library.Http = httpservice
+	local JSONEncodeFunc = httpservice.JSONEncode
+	function JSONEncode(...)
+		return pcall(JSONEncodeFunc, httpservice, ...)
+	end
+	library.JSONEncode = JSONEncode
+	local JSONDecodeFunc = httpservice.JSONDecode
+	function JSONDecode(...)
+		return pcall(JSONDecodeFunc, httpservice, ...)
+	end
+	library.JSONDecode = JSONDecode
 end
-library.Http = httpservice
-local JSONEncodeFunc = httpservice.JSONEncode
-function JSONEncode(...)
-	return pcall(JSONEncodeFunc, httpservice, ...)
-end
-library.JSONEncode = JSONEncode
-local JSONDecodeFunc = httpservice.JSONDecode
-function JSONDecode(...)
-	return pcall(JSONDecodeFunc, httpservice, ...)
-end
-library.JSONDecode = JSONDecode
-function library:CreateWindow(options)
+function library:CreateWindow(options, ...)
+	options = (options and type(options) == "string" and resolvevararg("Window", options, ...)) or options
 	local homepage = nil
 	local windowoptions = options
 	local windowName = options.Name or "Unnamed Window"
@@ -1176,15 +1234,10 @@ function library:CreateWindow(options)
 			}):Play()
 		end)
 	end
-	function windowFunctions:CreateTab(options)
-		options = options or {
+	function windowFunctions:CreateTab(options, ...)
+		options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options or {
 			Name = "Pepsi Style: Elite Hax"
 		}
-		if options and type(options) == "string" then
-			options = {
-				Name = options
-			}
-		end
 		local image = options.Image
 		if image then
 			image = resolveid(image)
@@ -1294,7 +1347,8 @@ function library:CreateWindow(options)
 		local tabFunctions = {
 			Flags = {}
 		}
-		function tabFunctions:CreateSection(options)
+		function tabFunctions:CreateSection(options, ...)
+			options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options
 			local sectionName, holderSide = options.Name or "Unnamed Section", options.Side
 			options.Name = sectionName
 			local newSection = Instance_new("Frame")
@@ -1375,7 +1429,8 @@ function library:CreateWindow(options)
 				newSection.Size = UDim2.new(1, -20, 0, (sectionList.AbsoluteContentSize.Y + 15))
 				currentHolder.CanvasSize = UDim2:fromOffset(currentHolder:FindFirstChildOfClass("UIListLayout").AbsoluteContentSize.Y + 22 + (extra and extra or 0))
 			end
-			function sectionFunctions:AddToggle(options)
+			function sectionFunctions:AddToggle(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options
 				local toggleName, alreadyEnabled, callback, flagName = assert(options.Name, "Missing Name for new toggle."), options.Value or options.Enabled, options.Callback, options.Flag or (function()
 					library.unnamedtoggles = 1 + (library.unnamedtoggles or 0)
 					return "Toggle" .. tostring(library.unnamedtoggles)
@@ -1952,6 +2007,10 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flagName], sectionFunctions.Flags[flagName], elements[flagName] = objectdata, objectdata, objectdata
 				return objectdata
 			end
+			sectionFunctions.CreateToggle = sectionFunctions.AddToggle
+			sectionFunctions.NewToggle = sectionFunctions.AddToggle
+			sectionFunctions.Toggle = sectionFunctions.AddToggle
+			sectionFunctions.Tog = sectionFunctions.AddToggle
 			function sectionFunctions:AddButton(...)
 				local args = nil
 				if ... and not select(2, ...) and type(...) == "table" and #... > 0 and type((...)[1]) == "table" and (...)[1].Name then
@@ -1962,6 +2021,7 @@ function library:CreateWindow(options)
 				local buttons, offset = {}, 0
 				local fram = nil
 				for _, options in pairs(args) do
+					options = (options and options[1] and type(options[1]) == "string" and resolvevararg("Button", unpack(options))) or options
 					local buttonName, callback = assert(options.Name, "Missing Name for new button."), options.Callback or (warn("AddButton missing callback. Name:", options.Name or "No Name", "\n", debug.traceback()) and nil) or function()
 					end
 					local lockedup = options.Locked
@@ -2219,7 +2279,11 @@ function library:CreateWindow(options)
 				end
 				return buttons
 			end
-			function sectionFunctions:AddTextbox(options)
+			sectionFunctions.CreateButton = sectionFunctions.AddButton
+			sectionFunctions.NewButton = sectionFunctions.AddButton
+			sectionFunctions.Button = sectionFunctions.AddButton
+			function sectionFunctions:AddTextbox(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("Textbox", options, ...)) or options
 				local textboxName, presetValue, placeholder, callback, flagName = assert(options.Name, "Missing Name for new textbox."), options.Value, options.Placeholder, options.Callback, options.Flag or (function()
 					library.unnamedtextboxes = 1 + (library.unnamedtextboxes or 0)
 					return "Textbox" .. tostring(library.unnamedtextboxes)
@@ -2459,7 +2523,16 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flagName], sectionFunctions.Flags[flagName], elements[flagName] = objectdata, objectdata, objectdata
 				return objectdata
 			end
-			function sectionFunctions:AddKeybind(options)
+			sectionFunctions.AddTextBox = sectionFunctions.AddTextbox
+			sectionFunctions.NewTextBox = sectionFunctions.AddTextbox
+			sectionFunctions.CreateTextBox = sectionFunctions.AddTextbox
+			sectionFunctions.TextBox = sectionFunctions.AddTextbox
+			sectionFunctions.NewTextbox = sectionFunctions.AddTextbox
+			sectionFunctions.CreateTextbox = sectionFunctions.AddTextbox
+			sectionFunctions.Textbox = sectionFunctions.AddTextbox
+			sectionFunctions.Box = sectionFunctions.AddTextbox
+			function sectionFunctions:AddKeybind(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("Keybind", options, ...)) or options
 				local keybindName, presetKeybind, callback, presscallback, flag = assert(options.Name, "Missing Name for new keybind."), options.Value, options.Callback, options.Pressed, options.Flag or (function()
 					library.unnamedkeybinds = 1 + (library.unnamedkeybinds or 0)
 					return "Keybind" .. tostring(library.unnamedkeybinds)
@@ -2699,7 +2772,12 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flag], sectionFunctions.Flags[flag], elements[flag] = objectdata, objectdata, objectdata
 				return objectdata
 			end
-			function sectionFunctions:AddLabel(options)
+			sectionFunctions.NewKeybind = sectionFunctions.AddKeybind
+			sectionFunctions.CreateKeybind = sectionFunctions.AddKeybind
+			sectionFunctions.Keybind = sectionFunctions.AddKeybind
+			sectionFunctions.Bind = sectionFunctions.AddKeybind
+			function sectionFunctions:AddLabel(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("Label", options, ...)) or options
 				local labelName, flag = options.Text or options.Value or options.Name, options.Flag or (function()
 					library.unnamedlabels = 1 + (library.unnamedlabels or 0)
 					return "Label" .. tostring(library.unnamedlabels)
@@ -2763,7 +2841,12 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flag], sectionFunctions.Flags[flag], elements[flag] = objectdata, objectdata, objectdata
 				return objectdata
 			end
-			function sectionFunctions:AddSlider(options)
+			sectionFunctions.NewLabel = sectionFunctions.AddLabel
+			sectionFunctions.CreateLabel = sectionFunctions.AddLabel
+			sectionFunctions.Label = sectionFunctions.AddLabel
+			sectionFunctions.Text = sectionFunctions.AddLabel
+			function sectionFunctions:AddSlider(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("Slider", options, ...)) or options
 				local sliderName, maxValue, minValue, presetValue, callback, flagName = assert(options.Name, "Missing Name for new slider."), assert(options.Max, "Missing Max for new slider."), assert(options.Min, "Missing Min for new slider."), options.Value, options.Callback, options.Flag or (function()
 					library.unnamedsliders = 1 + (library.unnamedsliders or 0)
 					return "Slider" .. tostring(library.unnamedsliders)
@@ -3153,7 +3236,13 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flagName], sectionFunctions.Flags[flagName], elements[flagName] = objectdata, objectdata, objectdata
 				return objectdata
 			end
-			function sectionFunctions:AddSearchBox(options)
+			sectionFunctions.NewSlider = sectionFunctions.AddSlider
+			sectionFunctions.CreateSlider = sectionFunctions.AddSlider
+			sectionFunctions.NumberConstraint = sectionFunctions.AddSlider
+			sectionFunctions.Slider = sectionFunctions.AddSlider
+			sectionFunctions.Slide = sectionFunctions.AddSlider
+			function sectionFunctions:AddSearchBox(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("SearchBox", options, ...)) or options
 				local dropdownName, listt, val, callback, flagName = assert(options.Name, "Missing Name for new searchbox."), assert(options.List, "Missing List for new searchbox."), options.Value, options.Callback, options.Flag or (function()
 					library.unnamedsearchbox = 1 + (library.unnamedsearchbox or 0)
 					return "SearchBox" .. tostring(library.unnamedsearchbox)
@@ -3299,7 +3388,12 @@ function library:CreateWindow(options)
 				realDropdownHolder.Selectable = false
 				realDropdownHolder.Size = UDim2.fromScale(1, 1)
 				realDropdownHolder.CanvasSize = UDim2.new()
-				realDropdownHolder.ScrollBarThickness = 0
+				realDropdownHolder.ScrollBarThickness = 5
+				realDropdownHolder.ScrollingDirection = Enum.ScrollingDirection.Y
+				realDropdownHolder.AutomaticCanvasSize = Enum.AutomaticSize.Y
+				realDropdownHolder.ScrollBarImageTransparency = 0.5
+				realDropdownHolder.ScrollBarImageColor3 = library.colors.section
+				colored[1 + #colored] = {realDropdownHolder, "ScrollBarImageColor3", "section"}
 				realDropdownHolderList.Name = "realDropdownHolderList"
 				realDropdownHolderList.Parent = realDropdownHolder
 				realDropdownHolderList.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -3509,6 +3603,7 @@ function library:CreateWindow(options)
 						end
 					end
 				end
+				local precisionscrolling = nil
 				local showing = false
 				local function display(dropdownEnabled, f)
 					if submenuOpen == dropdown or submenuOpen == nil then
@@ -3532,6 +3627,27 @@ function library:CreateWindow(options)
 								ImageColor3 = darkenColor(library.colors.main, 2.5)
 							}):Play()
 							dropdownHolderFrame.Visible = true
+							if not options.DisablePrecisionScrolling then
+								local scrollrate = tonumber(options.ScrollButtonRate or options.ScrollRate) or 5
+								local upkey = options.ScrollUpButton or library.scrollupbutton or shared.scrollupbutton or Enum.KeyCode.Up
+								local downkey = options.ScrollDownButton or library.scrolldownbutton or shared.scrolldownbutton or Enum.KeyCode.Down
+								precisionscrolling = (precisionscrolling and precisionscrolling:Disconnect() and nil) or userInputService.InputBegan:Connect(function(input)
+									if input.UserInputType == Enum.UserInputType.Keyboard then
+										local code = input.KeyCode
+										local isup = code == upkey
+										local isdown = code == downkey
+										if isup or isdown then
+											local txt = userInputService:GetFocusedTextBox()
+											if not txt or txt == dropdownSelection then
+												while wait_check() and userInputService:IsKeyDown(code) do
+													realDropdownHolder.CanvasPosition = Vector2:new(math.clamp(realDropdownHolder.CanvasPosition.Y + ((isup and -scrollrate) or scrollrate), 0, realDropdownHolder.AbsoluteCanvasSize.Y))
+												end
+											end
+										end
+									end
+								end)
+								library.signals[1 + #library.signals] = precisionscrolling
+							end
 						else
 							submenuOpen = nil
 							dropdownToggle.Rotation = 90
@@ -3547,6 +3663,7 @@ function library:CreateWindow(options)
 							for ins, z in pairs(restorezindex) do
 								ins.ZIndex = z
 							end
+							precisionscrolling = (precisionscrolling and precisionscrolling:Disconnect() and nil) or nil
 						end
 					end
 					showing = dropdownEnabled
@@ -3575,7 +3692,7 @@ function library:CreateWindow(options)
 						end
 						return selectedOption
 					elseif type(dat) ~= "table" then
-						warn("Expected table for argument #1 on Set for MultiSelect dropdown. Got", dat, "\n", debug.traceback())
+						warn("Expected table for argument #1 on Set for MultiSelect searchbox. Got", dat, "\n", debug.traceback())
 						return selectedOption
 					end
 					for k = table.pack(unpack(dat)).n, 1, -1 do
@@ -3616,16 +3733,13 @@ function library:CreateWindow(options)
 				end
 				library.signals[1 + #library.signals] = dropdownToggle.MouseButton1Click:Connect(function()
 					showing = not showing
-					print("MouseButton1Click Fired:", showing)
 					display(showing)
 				end)
 				library.signals[1 + #library.signals] = dropdownSelection.Focused:Connect(function()
 					showing = true
-					print("Focused Fired:", true)
 					display(true)
 				end)
 				library.signals[1 + #library.signals] = dropdownSelection:GetPropertyChangedSignal("Text"):Connect(function()
-					print("Text Changed Fired:", showing)
 					if showing then
 						display(true, #dropdownSelection.Text > 0)
 					end
@@ -3636,7 +3750,6 @@ function library:CreateWindow(options)
 							wait()
 						end
 						showing = false
-						print("FocusLost Fired:", false)
 						display(false)
 						if b then
 							Set(dropdownSelection.Text)
@@ -3687,7 +3800,7 @@ function library:CreateWindow(options)
 							end
 							return selectedOption
 						elseif type(dat) ~= "table" then
-							warn("Expected table for argument #1 on Set for MultiSelect dropdown. Got", dat, "\n", debug.traceback())
+							warn("Expected table for argument #1 on Set for MultiSelect searchbox. Got", dat, "\n", debug.traceback())
 							return selectedOption
 						end
 						for k = table.pack(unpack(dat)).n, 1, -1 do
@@ -3743,8 +3856,17 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flagName], sectionFunctions.Flags[flagName], elements[flagName] = objectdata, objectdata, objectdata
 				return objectdata
 			end
+			sectionFunctions.NewSearchBox = sectionFunctions.AddSearchBox
+			sectionFunctions.CreateSearchBox = sectionFunctions.AddSearchBox
+			sectionFunctions.SearchBox = sectionFunctions.AddSearchBox
+			sectionFunctions.CreateSearchbox = sectionFunctions.AddSearchBox
+			sectionFunctions.NewSearchbox = sectionFunctions.AddSearchBox
+			sectionFunctions.Searchbox = sectionFunctions.AddSearchBox
+			sectionFunctions.Sbox = sectionFunctions.AddSearchBox
+			sectionFunctions.SBox = sectionFunctions.AddSearchBox
 			if isfolder and makefolder and listfiles and readfile and writefile then
-				sectionFunctions.AddPersistence = function(_, options)
+				function sectionFunctions:AddPersistence(options, ...)
+					options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options
 					local dropdownName, custom_workspace, val, persistiveflags, suffix, callback, loadcallback, savecallback, postload, postsave, flagName = assert(options.Name, "Missing Name for new persistence."), options.Workspace or library.WorkspaceName, options.Value, options.Persistive or options.Flags or "all", options.Suffix, options.Callback, options.LoadCallback, options.SaveCallback, options.PostLoadCallback, options.PostSaveCallback, options.Flag or (function()
 						library.unnamedpersistence = 1 + (library.unnamedpersistence or 0)
 						return "Persistence" .. tostring(library.unnamedpersistence)
@@ -3904,7 +4026,12 @@ function library:CreateWindow(options)
 					realDropdownHolder.Selectable = false
 					realDropdownHolder.Size = UDim2.fromScale(1, 1)
 					realDropdownHolder.CanvasSize = UDim2.new()
-					realDropdownHolder.ScrollBarThickness = 0
+					realDropdownHolder.ScrollBarThickness = 5
+					realDropdownHolder.ScrollingDirection = Enum.ScrollingDirection.Y
+					realDropdownHolder.AutomaticCanvasSize = Enum.AutomaticSize.Y
+					realDropdownHolder.ScrollBarImageTransparency = 0.5
+					realDropdownHolder.ScrollBarImageColor3 = library.colors.section
+					colored[1 + #colored] = {realDropdownHolder, "ScrollBarImageColor3", "section"}
 					realDropdownHolderList.Name = "realDropdownHolderList"
 					realDropdownHolderList.Parent = realDropdownHolder
 					realDropdownHolderList.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -4076,6 +4203,7 @@ function library:CreateWindow(options)
 							end
 						end
 					end
+					local precisionscrolling = nil
 					local showing = false
 					local function display(dropdownEnabled, f)
 						if submenuOpen == dropdown or submenuOpen == nil then
@@ -4099,6 +4227,26 @@ function library:CreateWindow(options)
 									ImageColor3 = darkenColor(library.colors.main, 2.5)
 								}):Play()
 								dropdownHolderFrame.Visible = true
+								if not options.DisablePrecisionScrolling then
+									local upkey = options.ScrollUpButton or library.scrollupbutton or shared.scrollupbutton or Enum.KeyCode.Up
+									local downkey = options.ScrollDownButton or library.scrolldownbutton or shared.scrolldownbutton or Enum.KeyCode.Down
+									precisionscrolling = (precisionscrolling and precisionscrolling:Disconnect() and nil) or userInputService.InputBegan:Connect(function(input)
+										if input.UserInputType == Enum.UserInputType.Keyboard then
+											local code = input.KeyCode
+											local isup = code == upkey
+											local isdown = code == downkey
+											if isup or isdown then
+												local txt = userInputService:GetFocusedTextBox()
+												if not txt then
+													while wait_check() and userInputService:IsKeyDown(code) do
+														realDropdownHolder.CanvasPosition = Vector2:new(math.clamp(realDropdownHolder.CanvasPosition.Y + ((isup and -5) or 5), 0, realDropdownHolder.AbsoluteCanvasSize.Y))
+													end
+												end
+											end
+										end
+									end)
+									library.signals[1 + #library.signals] = precisionscrolling
+								end
 							else
 								submenuOpen = nil
 								dropdownToggle.Rotation = 90
@@ -4114,6 +4262,7 @@ function library:CreateWindow(options)
 								for ins, z in pairs(restorezindex) do
 									ins.ZIndex = z
 								end
+								precisionscrolling = (precisionscrolling and precisionscrolling:Disconnect() and nil) or nil
 							end
 							showing = dropdownEnabled
 						end
@@ -4159,145 +4308,165 @@ function library:CreateWindow(options)
 						end
 					end)
 					AddOptions(list)
+					local function savestuff(s, get)
+						if not s or type(s) ~= "string" then
+							s = nil
+						end
+						local rawfile = "json__save"
+						if not get then
+							local filenameddst = string.gsub(s or dropdownSelection.Text or "", "%W", "")
+							if #filenameddst == 0 then
+								return
+							end
+							rawfile = string.format("%s/%s.txt", common_string, filenameddst)
+						end
+						if savecallback then
+							local x, e = pcall(savecallback, rawfile, library.flags[flagName])
+							if not x and e then
+								warn("Error while calling the Pre-Save callback:", e, "\n" .. debug.traceback())
+							end
+						end
+						local working_with = {}
+						if persistiveflags == 1 or persistiveflags == true or persistiveflags == "*" then
+							persistiveflags = "all"
+						elseif persistiveflags == 2 then
+							persistiveflags = "tab"
+						elseif persistiveflags == 3 then
+							persistiveflags = "section"
+						end
+						if persistiveflags == "all" or persistiveflags == "tab" or persistiveflags == "section" then
+							for cflag, data in pairs((persistiveflags == "all" and elements) or (persistiveflags == "tab" and tabFunctions.Flags) or (persistiveflags == "section" and sectionFunctions.Flags)) do
+								if data.Type ~= "Persistence" and (designerpersists or string.sub(cflag, 1, 11) ~= "__Designer.") then
+									working_with[cflag] = data
+								end
+							end
+						elseif type(persistiveflags) == "table" then
+							if #persistiveflags > 0 then
+								local inverted = persistiveflags[0] == false or persistiveflags.Inverted
+								for k, cflag in pairs(persistiveflags) do
+									if k > 0 then
+										local data = elements[cflag]
+										if data and data.Type ~= "Persistence" and (designerpersists or string.sub(cflag, 1, 11) ~= "__Designer.") then
+											working_with[cflag] = (not inverted and data) or nil
+										end
+									end
+								end
+							else
+								for cflag, persists in pairs(elements) do
+									if persists and (designerpersists or string.sub(cflag, 1, 11) ~= "__Designer.") then
+										local data = elements[cflag]
+										if data then
+											working_with[cflag] = data
+										end
+									end
+								end
+							end
+						end
+						local saving = {}
+						for cflag in pairs(working_with) do
+							local value = library.flags[cflag]
+							local good, jval = nil, nil
+							if value ~= nil then
+								good, jval = JSONEncode(value)
+							else
+								good, jval = true, "null"
+							end
+							if not good or (jval == "null" and value ~= nil) then
+								local typ = typeof(value)
+								if typ == "Color3" then
+									value = (library.rainbowflags[cflag] and "rainbow") or Color3ToHex(value)
+								end
+								value = tostring(value)
+								good, jval = JSONEncode(value)
+								if not good or (jval == "null" and value ~= nil) then
+									warn("Could not save value:", value, "\n", debug.traceback())
+								end
+							end
+							if good and jval then
+								saving[cflag] = value
+							end
+						end
+						local ret = nil
+						local good, content = JSONEncode(saving)
+						if good and content then
+							if not get then
+								writefile(rawfile, content)
+							else
+								ret = content
+							end
+						end
+						if postsave then
+							local x, e = pcall(postsave, rawfile, library.flags[flagName])
+							if not x and e then
+								warn("Error while calling the Post-Save callback:", e, "\n" .. debug.traceback())
+							end
+						end
+						return ret
+					end
+					local function loadstuff(s, jsonmode)
+						if not s or type(s) ~= "string" then
+							s = nil
+						end
+						local filename = "json__load"
+						if not jsonmode then
+							local filenameddst = string.gsub(s or dropdownSelection.Text, "%W", "")
+							if #filenameddst == 0 then
+								return
+							end
+							filename = string.format("%s/%s.txt", common_string, filenameddst)
+						end
+						if loadcallback then
+							local x, e = pcall(loadcallback, (jsonmode and s) or filename, library.flags[flagName])
+							if not x and e then
+								warn("Error while calling the Pre-Load callback:", e, "\n" .. debug.traceback())
+							end
+						end
+						if jsonmode or not isfile or isfile(filename) then
+							local content = (jsonmode and s) or (not jsonmode and readfile(filename))
+							if content and #content > 1 then
+								local good, jcontent = JSONDecode(content)
+								if good and jcontent then
+									for cflag, val in pairs(jcontent) do
+										if val and type(val) == "string" and #val > 7 and #val < 64 and string.sub(val, 1, 5) == "Enum." then
+											local e = string.find(val, ".", 6, true)
+											if e then
+												local en = Enum[string.sub(val, 6, e - 1)]
+												en = en and en[string.sub(val, e + 1)]
+												if en then
+													val = en
+												else
+													warn("Tried & failed to convert '" .. val .. "' to EnumItem")
+												end
+											end
+										end
+										local data = elements[cflag]
+										if data and data.Type ~= "Persistence" then
+											if data.Set then
+												data:Set(val)
+											else
+												library.flags[cflag] = val
+											end
+										end
+									end
+								end
+							end
+						end
+						if postload then
+							local x, e = pcall(postload, filename, library.flags[flagName])
+							if not x and e then
+								warn("Error while calling the Post-Load callback:", e, "\n" .. debug.traceback())
+							end
+						end
+					end
 					do
 						local buttons, offset = {}, 0
 						local fram = nil
 						for _, options in pairs({{
 							Name = "Save" .. ((suffix and (" " .. tostring(suffix))) or ""),
-							Callback = function()
-								local filenameddst = string.gsub(dropdownSelection.Text, "%W", "")
-								if #filenameddst == 0 then
-									return
-								end
-								local rawfile = string.format("%s/%s.txt", common_string, filenameddst)
-								if savecallback then
-									local x, e = pcall(savecallback, rawfile, library.flags[flagName])
-									if not x and e then
-										warn("Error while calling the Pre-Save callback:", e, "\n" .. debug.traceback())
-									end
-								end
-								local working_with = {}
-								if persistiveflags == 1 or persistiveflags == true or persistiveflags == "*" then
-									persistiveflags = "all"
-								elseif persistiveflags == 2 then
-									persistiveflags = "tab"
-								elseif persistiveflags == 3 then
-									persistiveflags = "section"
-								end
-								if persistiveflags == "all" or persistiveflags == "tab" or persistiveflags == "section" then
-									for cflag, data in pairs((persistiveflags == "all" and elements) or (persistiveflags == "tab" and tabFunctions.Flags) or (persistiveflags == "section" and sectionFunctions.Flags)) do
-										if data.Type ~= "Persistence" and (designerpersists or string.sub(cflag, 1, 11) ~= "__Designer.") then
-											working_with[cflag] = data
-										end
-									end
-								elseif type(persistiveflags) == "table" then
-									if #persistiveflags > 0 then
-										local inverted = persistiveflags[0] == false or persistiveflags.Inverted
-										for k, cflag in pairs(persistiveflags) do
-											if k > 0 then
-												local data = elements[cflag]
-												if data and data.Type ~= "Persistence" and (designerpersists or string.sub(cflag, 1, 11) ~= "__Designer.") then
-													working_with[cflag] = (not inverted and data) or nil
-												end
-											end
-										end
-									else
-										for cflag, persists in pairs(elements) do
-											if persists and (designerpersists or string.sub(cflag, 1, 11) ~= "__Designer.") then
-												local data = elements[cflag]
-												if data then
-													working_with[cflag] = data
-												end
-											end
-										end
-									end
-								end
-								local saving = {}
-								for cflag in pairs(working_with) do
-									local value = library.flags[cflag]
-									local good, jval = nil, nil
-									if value ~= nil then
-										good, jval = JSONEncode(value)
-									else
-										good, jval = true, "null"
-									end
-									if not good or (jval == "null" and value ~= nil) then
-										local typ = typeof(value)
-										if typ == "Color3" then
-											value = (library.rainbowflags[cflag] and "rainbow") or Color3ToHex(value)
-										end
-										value = tostring(value)
-										good, jval = JSONEncode(value)
-										if not good or (jval == "null" and value ~= nil) then
-											warn("Could not save value:", value, "\n", debug.traceback())
-										end
-									end
-									if good and jval then
-										saving[cflag] = value
-									end
-								end
-								local good, content = JSONEncode(saving)
-								if good and content then
-									writefile(rawfile, content)
-								end
-								if postsave then
-									local x, e = pcall(postsave, rawfile, library.flags[flagName])
-									if not x and e then
-										warn("Error while calling the Post-Save callback:", e, "\n" .. debug.traceback())
-									end
-								end
-							end
+							Callback = savestuff
 							}, {
 								Name = "Load" .. ((suffix and (" " .. tostring(suffix))) or ""),
-								Callback = function()
-									local filenameddst = string.gsub(dropdownSelection.Text, "%W", "")
-									if #filenameddst == 0 then
-										return
-									end
-									local filename = string.format("%s/%s.txt", common_string, filenameddst)
-									if loadcallback then
-										local x, e = pcall(loadcallback, filename, library.flags[flagName])
-										if not x and e then
-											warn("Error while calling the Pre-Load callback:", e, "\n" .. debug.traceback())
-										end
-									end
-									if not isfile or isfile(filename) then
-										local content = readfile(filename)
-										if content and #content > 1 then
-											local good, jcontent = JSONDecode(content)
-											if good and jcontent then
-												for cflag, val in pairs(jcontent) do
-													if val and type(val) == "string" and #val > 7 and #val < 64 and string.sub(val, 1, 5) == "Enum." then
-														local e = string.find(val, ".", 6, true)
-														if e then
-															local en = Enum[string.sub(val, 6, e - 1)]
-															en = en and en[string.sub(val, e + 1)]
-															if en then
-																val = en
-															else
-																warn("Tried & failed to convert '" .. val .. "' to EnumItem")
-															end
-														end
-													end
-													local data = elements[cflag]
-													if data and data.Type ~= "Persistence" then
-														if data.Set then
-															data:Set(val)
-														else
-															library.flags[cflag] = val
-														end
-													end
-												end
-											end
-										end
-									end
-									if postload then
-										local x, e = pcall(postload, filename, library.flags[flagName])
-										if not x and e then
-											warn("Error while calling the Post-Load callback:", e, "\n" .. debug.traceback())
-										end
-									end
-								end
+								Callback = loadstuff
 							}}) do
 							local buttonName, callback = options.Name, options.Callback
 							local realButton = Instance_new("TextButton")
@@ -4405,6 +4574,32 @@ function library:CreateWindow(options)
 						Parent = sectionFunctions,
 						Instance = dropdownSelection,
 						Set = Set,
+						SaveFile = function(t, str, ret)
+							if t ~= nil and type(t) ~= "table" then
+								str, ret = t, str
+							end
+							return savestuff(str, ret)
+						end,
+						LoadFile = function(t, str, jsonmode)
+							if t ~= nil and type(t) ~= "table" then
+								str, jsonmode = t, str
+							end
+							return loadstuff(str, jsonmode)
+						end,
+						LoadJSON = function(_, json)
+							return loadstuff(json, true)
+						end,
+						GetJSON = function(t, clipboard)
+							if nil == clipboard and t ~= nil then
+								clipboard = t
+							end
+							local json = savestuff(nil, true)
+							local clipfunc = (clipboard and type(clipboard) == "function" and clipboard) or setclipboard
+							if clipboard and clipfunc then
+								clipfunc(json)
+							end
+							return json
+						end,
 						RawSet = function(t, str)
 							if nil == str and t ~= nil then
 								str = t
@@ -4430,16 +4625,23 @@ function library:CreateWindow(options)
 					return objectdata
 				end
 			else
-				sectionFunctions.AddPersistence = function()
+				function sectionFunctions.AddPersistence()
 					if not library.warnedpersistance then
 						library.warnedpersistance = 1
 						warn("Persistance not supported\n", debug.traceback())
 					end
-					sectionFunctions.AddPersistence = function()
+					function sectionFunctions.AddPersistence()
 					end
 				end
 			end
-			function sectionFunctions:AddDropdown(options)
+			sectionFunctions.NewPersistence = sectionFunctions.AddPersistence
+			sectionFunctions.CreatePersistence = sectionFunctions.AddPersistence
+			sectionFunctions.Persistence = sectionFunctions.AddPersistence
+			sectionFunctions.CreateSaveLoad = sectionFunctions.AddPersistence
+			sectionFunctions.SaveLoad = sectionFunctions.AddPersistence
+			sectionFunctions.SL = sectionFunctions.AddPersistence
+			function sectionFunctions:AddDropdown(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("Dropdown", options, ...)) or options
 				local dropdownName, listt, val, callback, flagName = assert(options.Name, "Missing Name for new searchbox."), assert(options.List, "Missing List for new searchbox."), options.Value, options.Callback, options.Flag or (function()
 					library.unnameddropdown = 1 + (library.unnameddropdown or 0)
 					return "Dropdown" .. tostring(library.unnameddropdown)
@@ -4586,7 +4788,12 @@ function library:CreateWindow(options)
 				realDropdownHolder.Selectable = false
 				realDropdownHolder.Size = UDim2.fromScale(1, 1)
 				realDropdownHolder.CanvasSize = UDim2.new()
-				realDropdownHolder.ScrollBarThickness = 0
+				realDropdownHolder.ScrollBarThickness = 5
+				realDropdownHolder.ScrollingDirection = Enum.ScrollingDirection.Y
+				realDropdownHolder.AutomaticCanvasSize = Enum.AutomaticSize.Y
+				realDropdownHolder.ScrollBarImageTransparency = 0.5
+				realDropdownHolder.ScrollBarImageColor3 = library.colors.section
+				colored[1 + #colored] = {realDropdownHolder, "ScrollBarImageColor3", "section"}
 				realDropdownHolderList.Name = "realDropdownHolderList"
 				realDropdownHolderList.Parent = realDropdownHolder
 				realDropdownHolderList.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -4837,6 +5044,7 @@ function library:CreateWindow(options)
 						UpdateDropdownHolder()
 					end
 				end
+				local precisionscrolling = nil
 				local function display(dropdownEnabled)
 					list = resolvelist()
 					if dropdownEnabled then
@@ -4858,6 +5066,26 @@ function library:CreateWindow(options)
 							ImageColor3 = darkenColor(library.colors.main, 2.5)
 						}):Play()
 						dropdownHolderFrame.Visible = true
+						if not options.DisablePrecisionScrolling then
+							local upkey = options.ScrollUpButton or library.scrollupbutton or shared.scrollupbutton or Enum.KeyCode.Up
+							local downkey = options.ScrollDownButton or library.scrolldownbutton or shared.scrolldownbutton or Enum.KeyCode.Down
+							precisionscrolling = (precisionscrolling and precisionscrolling:Disconnect() and nil) or userInputService.InputBegan:Connect(function(input)
+								if input.UserInputType == Enum.UserInputType.Keyboard then
+									local code = input.KeyCode
+									local isup = code == upkey
+									local isdown = code == downkey
+									if isup or isdown then
+										local txt = userInputService:GetFocusedTextBox()
+										if not txt or txt == dropdownSelection then
+											while wait_check() and userInputService:IsKeyDown(code) do
+												realDropdownHolder.CanvasPosition = Vector2:new(math.clamp(realDropdownHolder.CanvasPosition.Y + ((isup and -5) or 5), 0, realDropdownHolder.AbsoluteCanvasSize.Y))
+											end
+										end
+									end
+								end
+							end)
+							library.signals[1 + #library.signals] = precisionscrolling
+						end
 					else
 						submenuOpen = nil
 						dropdownToggle.Rotation = 90
@@ -4873,8 +5101,9 @@ function library:CreateWindow(options)
 						for ins, z in pairs(restorezindex) do
 							ins.ZIndex = z
 						end
+						precisionscrolling = (precisionscrolling and precisionscrolling:Disconnect() and nil) or nil
 					end
-					if not next(list) or not table.find(list, library.flags[flagName]) then
+					if not multiselect and (not next(list) or not table.find(list, library.flags[flagName])) then
 						Set(list[1])
 					end
 					showing = dropdownEnabled
@@ -5005,7 +5234,17 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flagName], sectionFunctions.Flags[flagName], elements[flagName] = objectdata, objectdata, objectdata
 				return objectdata
 			end
-			function sectionFunctions:AddColorpicker(options, designers)
+			sectionFunctions.AddDropDown = sectionFunctions.AddDropdown
+			sectionFunctions.NewDropDown = sectionFunctions.AddDropdown
+			sectionFunctions.NewDropdown = sectionFunctions.AddDropdown
+			sectionFunctions.CreateDropdown = sectionFunctions.AddDropdown
+			sectionFunctions.CreateDropdown = sectionFunctions.AddDropdown
+			sectionFunctions.DropDown = sectionFunctions.AddDropdown
+			sectionFunctions.Dropdown = sectionFunctions.AddDropdown
+			sectionFunctions.DD = sectionFunctions.AddDropdown
+			sectionFunctions.Dd = sectionFunctions.AddDropdown
+			function sectionFunctions:AddColorpicker(options, ...)
+				options = (options and type(options) == "string" and resolvevararg("Colorpicker", options, ...)) or options
 				if options.Random == true then
 					options.Value = "random"
 				elseif options.Rainbow == true then
@@ -5015,7 +5254,7 @@ function library:CreateWindow(options)
 					library.unnamedcolorpicker = 1 + (library.unnamedcolorpicker or 0)
 					return "Colorpicker" .. tostring(library.unnamedcolorpicker)
 				end)()
-				designers = designers or options.__designer
+				local designers = options.__designer
 				options.__designer = nil
 				local rainbowColorMode = false
 				if presetColor == "random" then
@@ -5578,6 +5817,15 @@ function library:CreateWindow(options)
 				tabFunctions.Flags[flagName], sectionFunctions.Flags[flagName], elements[flagName] = objectdata, objectdata, objectdata
 				return objectdata
 			end
+			sectionFunctions.AddColorPicker = sectionFunctions.AddColorpicker
+			sectionFunctions.NewColorpicker = sectionFunctions.AddColorpicker
+			sectionFunctions.NewColorPicker = sectionFunctions.AddColorpicker
+			sectionFunctions.CreateColorPicker = sectionFunctions.AddColorpicker
+			sectionFunctions.CreateColorpicker = sectionFunctions.AddColorpicker
+			sectionFunctions.ColorPicker = sectionFunctions.AddColorpicker
+			sectionFunctions.Colorpicker = sectionFunctions.AddColorpicker
+			sectionFunctions.Cp = sectionFunctions.AddColorpicker
+			sectionFunctions.CP = sectionFunctions.AddColorpicker
 			function sectionFunctions:UpdateAll()
 				local target = self or sectionFunctions
 				if target and type(target) == "table" and target.Flags then
@@ -5590,6 +5838,11 @@ function library:CreateWindow(options)
 			end
 			return sectionFunctions
 		end
+		tabFunctions.AddSection = tabFunctions.CreateSection
+		tabFunctions.NewSection = tabFunctions.CreateSection
+		tabFunctions.Section = tabFunctions.CreateSection
+		tabFunctions.Sec = tabFunctions.CreateSection
+		tabFunctions.S = tabFunctions.CreateSection
 		function tabFunctions:UpdateAll()
 			local target = self or tabFunctions
 			if target and type(target) == "table" and target.Flags then
@@ -5602,8 +5855,13 @@ function library:CreateWindow(options)
 		end
 		return tabFunctions
 	end
-	function windowFunctions:CreateDesigner(options)
-		assert(library.Designer == nil, "Designer already exists")
+	windowFunctions.AddTab = windowFunctions.CreateTab
+	windowFunctions.NewTab = windowFunctions.CreateTab
+	windowFunctions.Tab = windowFunctions.CreateTab
+	windowFunctions.T = windowFunctions.CreateTab
+	function windowFunctions:CreateDesigner(options, ...)
+		options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options
+		assert(shared.bypasstablimit or library.Designer == nil, "Designer already exists")
 		options = options or {}
 		options.Image = options.Image or 7483871523
 		options.LastTab = true
@@ -5638,8 +5896,9 @@ function library:CreateWindow(options)
 					Value = library.colors[codename],
 					Callback = function(v, y)
 						library.colors[codename] = v or y
-					end
-				}, 1),
+					end,
+					__designer = 1
+				}),
 				Flag = cflag
 			}
 		end
@@ -5864,6 +6123,10 @@ function library:CreateWindow(options)
 		spawn(updatecolors)
 		return library.Designer
 	end
+	windowFunctions.AddDesigner = windowFunctions.CreateDesigner
+	windowFunctions.NewDesigner = windowFunctions.CreateDesigner
+	windowFunctions.Designer = windowFunctions.CreateDesigner
+	windowFunctions.D = windowFunctions.CreateDesigner
 	function windowFunctions:UpdateAll()
 		local target = self or windowFunctions
 		if target and type(target) == "table" and target.Flags then
@@ -5926,4 +6189,7 @@ function library:CreateWindow(options)
 	end
 	return windowFunctions
 end
-return library
+library.AddWindow = library.CreateWindow
+library.Window = library.CreateWindow
+library.W = library.CreateWindow
+return
