@@ -1,5 +1,5 @@
 --[[ Pepsi's UI Library
-Library v0.20 [
+Library v0.27 [
     CreateWindow: Function (
         (table | nil) Options [
             (string | nil) Name = "Window Name"
@@ -59,7 +59,7 @@ Library v0.20 [
                         (any) UnloadValue = UnloadValue
                         (function | nil) UnloadFunc = Function
                         (boolean | nil) Locked = true or false
-                        (table | boolean | nil) Keybind = Keybind [
+                        (table | boolean | EnumItem | nil) Keybind/Key/KeyBind = Keybind [
                             (string | nil) Flag = "ToggleKeybindFlag"
                             (EnumItem | nil) Value = Enum.KeyCode.F
                             (function | nil) Callback = Function (NewValue, OldValue)
@@ -427,6 +427,7 @@ Library v0.20 [
     Players: game.Players
     Mouse: LP:GetMouse()
     Unload: Function
+	ResetAll: Function // Resets all elements to their default value
 	signals: Table // All :connection()'s go in that table, and are disconnected upon unloading the gui. Feel free to add yours here, too
     (function | nil) UnloadCallback = Function
 	(EnumItem/Keycode | nil) scrollupbutton = Enum.KeyCode.Up // Default is Enum.KeyCode.Up
@@ -443,7 +444,7 @@ Library v0.20 [
 ]
 ]]
 local library = {
-	Version = "0.20",
+	Version = "0.27",
 	WorkspaceName = "Pepsi Lib",
 	flags = {},
 	signals = {},
@@ -534,8 +535,11 @@ local lasthidebing = 0
 local temp = game:FindService("MarketplaceService") or game:GetService("MarketplaceService")
 local Marketplace = (temp and (cloneref and cloneref(temp))) or temp
 local resolvevararg, temp = nil
-function library.defaultSort(a, b)
-	return tostring(b):lower() > tostring(a):lower()
+do
+	local lwr = string.lower
+	function library.defaultSort(a, b)
+		return lwr(tostring(b)) > lwr(tostring(a))
+	end
 end
 do
 	local varargresolve = {
@@ -543,15 +547,15 @@ do
 		Tab = {"Name", "Image"},
 		Section = {"Name", "Side"},
 		Label = {"Text", "Flag", "UnloadValue", "UnloadFunc"},
-		Toggle = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Locked", "Keybind", "Condition"},
-		Textbox = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Placeholder", "Type", "Min", "Max", "Decimals", "Hex", "Binary", "Base", "RichTextBox", "MultiLine", "TextScaled", "TextFont", "PreFormat", "PostFormat", "CustomProperties"},
-		Slider = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Min", "Max", "Decimals", "Format", "IllegalInput", "Textbox"},
+		Toggle = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Locked", "Keybind", "Condition", "AllowDuplicateCalls"},
+		Textbox = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Placeholder", "Type", "Min", "Max", "Decimals", "Hex", "Binary", "Base", "RichTextBox", "MultiLine", "TextScaled", "TextFont", "PreFormat", "PostFormat", "CustomProperties", "AllowDuplicateCalls"},
+		Slider = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Min", "Max", "Decimals", "Format", "IllegalInput", "Textbox", "AllowDuplicateCalls"},
 		Button = {"Name", "Callback", "Locked", "Condition"},
-		Keybind = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Pressed", "KeyNames"},
-		Dropdown = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "List", "Filter", "Method", "Nothing", "Sort", "MultiSelect", "ItemAdded", "ItemRemoved", "ItemChanged", "ItemsCleared", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling"},
-		SearchBox = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "List", "Filter", "Method", "Nothing", "Sort", "MultiSelect", "ItemAdded", "ItemRemoved", "ItemChanged", "ItemsCleared", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling", "RegEx"},
-		Colorpicker = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Rainbow", "Random"},
-		Persistence = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Workspace", "Persistive", "Suffix", "LoadCallback", "SaveCallback", "PostLoadCallback", "PostSaveCallback", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling"},
+		Keybind = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Pressed", "KeyNames", "AllowDuplicateCalls"},
+		Dropdown = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "List", "Filter", "Method", "Nothing", "Sort", "MultiSelect", "ItemAdded", "ItemRemoved", "ItemChanged", "ItemsCleared", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling", "AllowDuplicateCalls"},
+		SearchBox = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "List", "Filter", "Method", "Nothing", "Sort", "MultiSelect", "ItemAdded", "ItemRemoved", "ItemChanged", "ItemsCleared", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling", "RegEx", "AllowDuplicateCalls"},
+		Colorpicker = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Rainbow", "Random", "AllowDuplicateCalls"},
+		Persistence = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Workspace", "Persistive", "Suffix", "LoadCallback", "SaveCallback", "PostLoadCallback", "PostSaveCallback", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling", "AllowDuplicateCalls"},
 		Designer = {"Backdrop", "Image", "Info", "Credit"}
 	}
 	function resolvevararg(objtype, ...)
@@ -594,9 +598,10 @@ local function resolveid(image, flag)
 		local succezz = pcall(function()
 			local typ = type(image)
 			if typ == "string" then
-				if getsynasset then
+				local getasset = (syn and getsynasset) or (identifyexecutor() == "ScriptWare" and getcustomasset)
+				if getasset then
 					if #image > 11 and string.sub(image, 1, 11) == "synasset://" then
-						return getsynasset(string.sub(image, 12))
+						return getasset(string.sub(image, 12))
 					elseif #image > 14 and string.sub(image, 1, 14) == "synasseturl://" then
 						local x, e = pcall(function()
 							local codename, fixes = string.gsub(image, ".", function(c)
@@ -623,7 +628,7 @@ local function resolveid(image, flag)
 									writefile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat", res)
 								end
 							end
-							return getsynasset(readfile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat"))
+							return getasset(readfile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat"))
 						end)
 						if x and e ~= nil then
 							return e
@@ -670,23 +675,48 @@ library.subs.ResolveID = resolveid
 library.resolvercache = resolvercache
 local colored = library.colored
 local colors = library.colors
-local function updatecolors()
-	if library.objects and (#library.objects > 0 or next(library.objects)) then
-		for _, data in next, colored do
-			local x, e = pcall(function()
-				local cclr = colors[data[3]]
-				data[1][data[2]] = (data[4] and darkenColor(cclr, data[4])) or cclr
-			end)
-			if not x and e then
-				warn(e)
-			end
-		end
-		pcall(function()
-			if library.Backdrop then
-				library.Backdrop.Visible = not not library.flags["__Designer.Background.UseBackgroundImage"]
-				library.Backdrop.Image = resolveid(library.flags["__Designer.Background.ImageAssetID"], "__Designer.Background.ImageAssetID") or ""
-				library.Backdrop.ImageColor3 = library.flags["__Designer.Background.ImageColor"] or Color3.new(1, 1, 1)
-				library.Backdrop.ImageTransparency = (library.flags["__Designer.Background.ImageTransparency"] or 95) / 100
+local tweenService = game:GetService("TweenService")
+local updatecolors = nil
+do
+	local lastcolor = 0
+	local osclock = os.clock
+	local nfo = TweenInfo.new(0.5, library.configuration.easingStyle, library.configuration.easingDirection)
+	function updatecolors()
+		local stacktime = osclock()
+		lastcolor = stacktime
+		delay(0.01, function()
+			local dotween = lastcolor == stacktime
+			if library.objects and (#library.objects > 0 or next(library.objects)) then
+				for _, data in next, colored do
+					local x, e = nil, nil
+					if lastcolor == stacktime then
+						x, e = pcall(function()
+							local cclr = colors[data[3]]
+							local darkness = data[4]
+							tweenService:Create(data[1], nfo, {
+								[data[2]] = (darkness and darkness ~= 1 and darkenColor(cclr, darkness)) or cclr
+							}):Play()
+						end)
+					end
+					if not x then
+						x, e = pcall(function()
+							local cclr = colors[data[3]]
+							local darkness = data[4]
+							data[1][data[2]] = (darkness and darkness ~= 1 and darkenColor(cclr, darkness)) or cclr
+						end)
+					end
+					if not x and e then
+						warn(debug.traceback(e))
+					end
+				end
+				pcall(function()
+					if library.Backdrop then
+						library.Backdrop.Visible = not not library.flags["__Designer.Background.UseBackgroundImage"]
+						library.Backdrop.Image = resolveid(library.flags["__Designer.Background.ImageAssetID"], "__Designer.Background.ImageAssetID") or ""
+						library.Backdrop.ImageColor3 = library.flags["__Designer.Background.ImageColor"] or Color3.new(1, 1, 1)
+						library.Backdrop.ImageTransparency = (library.flags["__Designer.Background.ImageTransparency"] or 95) / 100
+					end
+				end)
 			end
 		end)
 	end
@@ -766,33 +796,10 @@ local keyHandler = {
 		[Enum.KeyCode.Backquote] = "`"
 	}
 }
-local function unloadall()
-	if shared.libraries then
-		local b = 50
-		while #shared.libraries > 0 do
-			b = b - 1
-			if b < 0 then
-				b = 50
-				wait(warn("Looped 50 times while unloading....?"))
-			end
-			local v = shared.libraries[1]
-			if v and v.unload and type(v.unload) == "function" then
-				if not pcall(v.unload) then
-					for k in next, v do
-						v[k] = nil
-					end
-				end
-				table.remove(shared.libraries, 1)
-			end
-		end
+local function hardunload(library)
+	if library.UnloadCallback and type(library.UnloadCallback) == "function" then
+		spawn(library.UnloadCallback)
 	end
-	shared.libraries = nil
-end
-shared.unloadall = unloadall
-library.unloadall = unloadall
-shared.libraries[1 + #shared.libraries] = library
-function library.unload()
-	__runscript = nil
 	for cflag, data in next, elements do
 		if data.Type ~= "Persistence" then
 			if data.Set and data.Options.UnloadValue ~= nil then
@@ -801,7 +808,7 @@ function library.unload()
 			if data.Options.UnloadFunc then
 				local y, u = pcall(data.Options.UnloadFunc)
 				if not y and u then
-					warn("Error unloading " .. cflag .. "\n" .. u .. "\n" .. debug.traceback())
+					warn(debug.traceback("Error unloading '" .. tostring(cflag) .. "'\n" .. u))
 				end
 			end
 		end
@@ -821,9 +828,37 @@ function library.unload()
 	end
 	library.signals = nil
 	library.objects = nil
-	if library.UnloadCallback and type(library.UnloadCallback) == "function" then
-		spawn(library.UnloadCallback)
+end
+library.Subs.UnloadArg = hardunload
+local function unloadall()
+	if shared.libraries then
+		local b = 50
+		while #shared.libraries > 0 do
+			b = b - 1
+			if b < 0 then
+				b = 50
+				wait(warn("Looped 50 times while unloading....?"))
+			end
+			local v = shared.libraries[1]
+			if v and v.unload and type(v.unload) == "function" then
+				if not pcall(v.unload) then
+					pcall(hardunload, v)
+					for k in next, v do
+						v[k] = nil
+					end
+				end
+				table.remove(shared.libraries, 1)
+			end
+		end
 	end
+	shared.libraries = nil
+end
+shared.unloadall = unloadall
+library.unloadall = unloadall
+shared.libraries[1 + #shared.libraries] = library
+function library.unload()
+	__runscript = nil
+	hardunload(library)
 	if shared.libraries then
 		for k, v in next, shared.libraries or {} do
 			if v == library then
@@ -964,13 +999,25 @@ local function getresolver(listt, filter, method, _)
 	end
 end
 library.subs.GetResolver = getresolver
-local tweenService = game:GetService("TweenService")
+local function resetall()
+	destroyrainbowsg = true
+	pcall(function()
+		for k, v in next, elements do
+			if v and k and v.Set and v.Default ~= nil and library.flags[k] ~= v.Default and string.sub(k, 1, 11) ~= "__Designer." then
+				v:Set(v.Default)
+			end
+		end
+	end)
+end
+library.ResetAll = resetall
 local textService = game:GetService("TextService")
 local userInputService = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local LP = playersservice.LocalPlayer
 library.LP = LP
 library.Players = playersservice
+library.UserInputService = userInputService
+library.RunService = runService
 local mouse = LP and LP:GetMouse()
 if not mouse and PluginManager and runService:IsStudio() then
 	shared.library_plugin = shared.library_plugin or print("Creating Studio Test-Plugin...") or PluginManager():CreatePlugin()
@@ -1077,6 +1124,23 @@ do
 	end
 	library.JSONDecode = JSONDecode
 end
+local convertfilename
+do
+	local string_gsub = string.gsub
+	function convertfilename(str, default, replace)
+		replace = replace or "_"
+		local corrections = 0
+		local predname = string_gsub(str, "%W", function(c)
+			local byt = c:byte()
+			if not (byt == 0 or byt == 32 or byt == 33 or byt == 59 or byt == 61 or (byt >= 35 and byt <= 41) or (byt >= 43 and byt <= 57) or (byt >= 64 and byt <= 123) or (byt >= 125 and byt <= 127)) then
+				corrections = 1 + corrections
+				return replace
+			end
+		end)
+		return (default and corrections == #predname and tostring(default)) or predname
+	end
+	library.subs.ConvertFilename = convertfilename
+end
 function library:CreateWindow(options, ...)
 	options = (options and type(options) == "string" and resolvevararg("Window", options, ...)) or options
 	local homepage = nil
@@ -1084,7 +1148,7 @@ function library:CreateWindow(options, ...)
 	local windowName = options.Name or "Unnamed Window"
 	options.Name = windowName
 	if windowName and #windowName > 0 and library.WorkspaceName == "Pepsi Lib" then
-		library.WorkspaceName = windowName
+		library.WorkspaceName = convertfilename(windowName, "Pepsi Lib")
 	end
 	local pepsiLibrary = Instance_new("ScreenGui")
 	local main = Instance_new("Frame")
@@ -1219,29 +1283,47 @@ function library:CreateWindow(options, ...)
 	tabSlider.Position = UDim2.fromOffset(100, 30)
 	tabSlider.Size = UDim2:fromOffset(1)
 	tabSlider.Visible = false
-	library.signals[1 + #library.signals] = userInputService.InputBegan:Connect(function(keyCode, gameProcessedEvent)
-		gameProcessedEvent = gameProcessedEvent or userInputService:GetFocusedTextBox()
-		if not gameProcessedEvent and keyCode.KeyCode == library.configuration.hideKeybind then
-			if not lasthidebing or os.clock() - lasthidebing > 12 then
-				main.Visible = not main.Visible
+	do
+		local os_clock = os.clock
+		library.signals[1 + #library.signals] = userInputService.InputBegan:Connect(function(keyCode, gameProcessedEvent)
+			gameProcessedEvent = gameProcessedEvent or userInputService:GetFocusedTextBox()
+			if not gameProcessedEvent and keyCode.KeyCode == library.configuration.hideKeybind then
+				if not lasthidebing or os_clock() - lasthidebing > 12 then
+					main.Visible = not main.Visible
+				end
+				lasthidebing = nil
 			end
-			lasthidebing = nil
-		end
-	end)
+		end)
+	end
 	local windowFunctions = {
 		tabCount = 0,
 		selected = {},
 		Flags = elements
 	}
 	library.globals["__Window" .. windowName].windowFunctions = windowFunctions
+	function windowFunctions:Show(x)
+		main.Visible = x == nil or x == true or x == 1
+	end
+	function windowFunctions:Hide(x)
+		main.Visible = x == false or x == 0
+	end
+	function windowFunctions:Visibility(x)
+		if x == nil then
+			main.Visible = not main.Visible
+		else
+			main.Visible = not not x
+		end
+	end
 	function windowFunctions:MoveTabSlider(tabObject)
 		spawn(function()
+			tabSlider.Visible = true
 			tweenService:Create(tabSlider, TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection), {
 				Size = UDim2.fromOffset(tabObject.AbsoluteSize.X, 1),
 				Position = UDim2.fromOffset(tabObject.AbsolutePosition.X, tabObject.AbsolutePosition.Y + tabObject.AbsoluteSize.Y) - UDim2.fromOffset(main.AbsolutePosition.X, main.AbsolutePosition.Y)
 			}):Play()
 		end)
 	end
+	windowFunctions.LastTab = nil
 	function windowFunctions:CreateTab(options, ...)
 		options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options or {
 			Name = "Pepsi Style: Elite Hax"
@@ -1266,14 +1348,22 @@ function library:CreateWindow(options, ...)
 		newTab.Parent = tabsHolder
 		newTab.BackgroundTransparency = 1
 		newTab.LayoutOrder = (options.LastTab and 99999) or tonumber(options.TabOrder or options.LayoutOrder) or (2 + windowFunctions.tabCount)
+		local colored_newTab_TextColor3 = nil
 		if image then
 			newTab.Image = image
 			newTab.ImageColor3 = options.ImageColor or options.Color or Color3.new(1, 1, 1)
 			newTab.Size = UDim2:new(tabsHolder.AbsoluteSize.Y, 1)
 		else
+			colored_newTab_TextColor3 = {newTab, "TextColor3", "tabText"}
+			colored[1 + #colored] = colored_newTab_TextColor3
 			newTab.Font = Enum.Font.Code
 			newTab.Text = (tabName and tostring(tabName)) or "???"
-			newTab.TextColor3 = (windowFunctions.tabCount == 1 and Color3.fromRGB(206, 206, 206) or Color3.fromRGB(165, 165, 165))
+			if windowFunctions.tabCount ~= 1 then
+				colored_newTab_TextColor3[4] = 1.35
+				newTab.TextColor3 = darkenColor(library.colors.tabText, 1.35)
+			else
+				newTab.TextColor3 = library.colors.tabText
+			end
 			newTab.TextSize = 14
 			newTab.TextStrokeColor3 = Color3.fromRGB(42, 42, 42)
 			newTab.TextStrokeTransparency = 0.75
@@ -1288,21 +1378,28 @@ function library:CreateWindow(options, ...)
 						end
 					end
 				end)
+				if windowFunctions.LastTab then
+					windowFunctions.LastTab[4] = 1.35
+				end
 				windowFunctions:MoveTabSlider(newTab)
 				if windowFunctions.selected.button.ClassName == "TextButton" then
 					tweenService:Create(windowFunctions.selected.button, TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection), {
-						TextColor3 = Color3.fromRGB(165, 165, 165)
+						TextColor3 = darkenColor(library.colors.tabText, 1.35)
 					}):Play()
+				end
+				if colored_newTab_TextColor3 then
+					colored_newTab_TextColor3[4] = nil
 				end
 				windowFunctions.selected.holder.Visible = false
 				windowFunctions.selected.button = newTab
 				windowFunctions.selected.holder = newTabHolder
 				if windowFunctions.selected.button.ClassName == "TextButton" then
 					tweenService:Create(windowFunctions.selected.button, TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection), {
-						TextColor3 = Color3.fromRGB(206, 206, 206)
+						TextColor3 = library.colors.tabText
 					}):Play()
 				end
 				windowFunctions.selected.holder.Visible = true
+				windowFunctions.LastTab = colored_newTab_TextColor3
 			end
 		end
 		if not homepage and newTab.LayoutOrder <= 4 then
@@ -1312,6 +1409,7 @@ function library:CreateWindow(options, ...)
 		if windowFunctions.tabCount == 1 then
 			tabSlider.Size = UDim2.fromOffset(newTab.AbsoluteSize.X, 1)
 			tabSlider.Position = UDim2.fromOffset(newTab.AbsolutePosition.X, newTab.AbsolutePosition.Y + newTab.AbsoluteSize.Y) - UDim2.fromOffset(main.AbsolutePosition.X, main.AbsolutePosition.Y)
+			tabSlider.Visible = true
 			windowFunctions.selected.holder = newTabHolder
 			windowFunctions.selected.button = newTab
 		end
@@ -1443,6 +1541,9 @@ function library:CreateWindow(options, ...)
 					library.unnamedtoggles = 1 + (library.unnamedtoggles or 0)
 					return "Toggle" .. tostring(library.unnamedtoggles)
 				end)()
+				if elements[flagName] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
+				end
 				local newToggle = Instance_new("Frame")
 				local toggle = Instance_new("ImageLabel")
 				local toggleInner = Instance_new("ImageLabel")
@@ -1452,10 +1553,6 @@ function library:CreateWindow(options, ...)
 				local keybindList = Instance_new("UIListLayout")
 				local keybindButton = Instance_new("TextButton")
 				local lockedup = options.Locked
-				library.flags[flagName] = not not alreadyEnabled
-				if options.Location then
-					options.Location[options.LocationFlag or flagName] = not not alreadyEnabled
-				end
 				newToggle.Name = removeSpaces((toggleName and toggleName:lower() or "???") .. "Toggle")
 				newToggle.Parent = sectionHolder
 				newToggle.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -1539,7 +1636,7 @@ function library:CreateWindow(options, ...)
 						if options.Location then
 							options.Location[options.LocationFlag or flagName] = newStatus
 						end
-						if callback and last_v ~= newStatus then
+						if callback and (last_v ~= newStatus or options.AllowDuplicateCalls) then
 							colored_toggleInner_BackgroundColor3[3] = (newStatus and "main") or "topGradient"
 							colored_toggleInner_BackgroundColor3[4] = (newStatus and 1.5) or nil
 							colored_toggleInner_ImageColor3[3] = (newStatus and "main") or "bottomGradient"
@@ -1553,10 +1650,16 @@ function library:CreateWindow(options, ...)
 					end
 					return newStatus
 				end
+				options.Keybind = options.Keybind or options.Key or options.KeyBind
 				local haskbflag, kbUpdate, kbData = nil, nil, nil
 				if options.Keybind then
 					local options = options.Keybind
-					if type(options) ~= "table" then
+					local htyp = typeof(options)
+					if htyp == "EnumItem" then
+						options = {
+							Value = options
+						}
+					elseif htyp ~= "table" then
 						options = {}
 					end
 					local presetKeybind, callback, kbpresscallback, kbflag = options.Value or options.Key, options.Callback, options.Pressed, options.Flag or (function()
@@ -1566,14 +1669,13 @@ function library:CreateWindow(options, ...)
 						library.unnamedkeybinds = 1 + (library.unnamedkeybinds or 0)
 						return "Keybind" .. tostring(library.unnamedkeybinds)
 					end)()
+					if elements[kbflag] ~= nil or kbflag == flagName then
+						warn(debug.traceback("Warning! Re-used flag '" .. kbflag .. "'", 3))
+					end
 					haskbflag = kbflag
 					library.keyHandler = keyHandler
 					local keyHandler = options.KeyNames or keyHandler
 					local bindedKey = presetKeybind
-					library.flags[kbflag] = bindedKey
-					if options.Location then
-						options.Location[options.LocationFlag or kbflag] = bindedKey
-					end
 					local justBinded = false
 					local keyName = keyHandler.allowedKeys[bindedKey] or (bindedKey and (bindedKey.Name or tostring(bindedKey):gsub("Enum.KeyCode.", ""))) or "NONE"
 					local newKeybind = newToggle
@@ -1658,7 +1760,7 @@ function library:CreateWindow(options, ...)
 										options.Location[options.LocationFlag or kbflag] = bindedKey
 									end
 									keyName = keyHandler.allowedKeys[bindedKey]
-									keybindButton.Text = "[" .. (keyName or bindedKey.Name or tostring(key.KeyCode):gsub("Enum.KeyCode.", "")) .. "]"
+									keybindButton.Text = "[" .. (keyName or (bindedKey and bindedKey.Name) or tostring(bindedKey.KeyCode):gsub("Enum.KeyCode.", "")) .. "]"
 									keybindButton.Size = UDim2.fromOffset(textToSize(keybindButton).X + 4, 12)
 									justBinded = true
 									colored_keybindButton_TextColor3[3] = "otherElementText"
@@ -1755,7 +1857,7 @@ function library:CreateWindow(options, ...)
 							end
 						end
 					end)
-					local function set(t, key)
+					local function kbset(t, key)
 						if nil == key and t ~= nil then
 							key = t
 						end
@@ -1777,17 +1879,26 @@ function library:CreateWindow(options, ...)
 						tweenService:Create(keybindButton, TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection), {
 							TextColor3 = library.colors.otherElementText
 						}):Play()
-						if callback and last_v ~= key then
+						if callback and (last_v ~= key or options.AllowDuplicateCalls) then
 							task.spawn(callback, key, last_v)
 						end
 						return key
+					end
+					if presetKeybind ~= nil then
+						kbset(presetKeybind)
+					else
+						library.flags[kbflag] = bindedKey
+						if options.Location then
+							options.Location[options.LocationFlag or kbflag] = bindedKey
+						end
 					end
 					local default = library.flags[kbflag]
 					local function UpdateKb()
 						callback, kbpresscallback = options.Callback, options.Pressed
 						local key = library.flags[kbflag]
+						bindedKey = key
 						keyName = keyHandler.allowedKeys[bindedKey] or (bindedKey and (bindedKey.Name or tostring(bindedKey):gsub("Enum.KeyCode.", ""))) or "NONE"
-						keybindButton.Text = "[" .. (keyName or (key and key.Name) or "NONE") .. "]"
+						keybindButton.Text = "[" .. (keyName or (key and key.Name) or tostring(key):gsub("Enum.KeyCode.", "")) .. "]"
 						keybindButton.Size = UDim2.fromOffset(textToSize(keybindButton).X + 4, 12)
 						colored_keybindButton_TextColor3[3] = "otherElementText"
 						colored_keybindButton_TextColor3[4] = (lockedup and 2.5) or nil
@@ -1808,7 +1919,7 @@ function library:CreateWindow(options, ...)
 						Get = function()
 							return library.flags[kbflag]
 						end,
-						Set = set,
+						Set = kbset,
 						RawSet = function(t, key)
 							if t ~= nil and key == nil then
 								key = t
@@ -1819,14 +1930,13 @@ function library:CreateWindow(options, ...)
 						end,
 						Update = UpdateKb,
 						Reset = function()
-							return set(nil, default)
+							return kbset(nil, default)
 						end
 					}
 					kbData = objectdata
 					tabFunctions.Flags[kbflag], sectionFunctions.Flags[kbflag], elements[kbflag] = objectdata, objectdata, objectdata
 				end
 				sectionFunctions:Update()
-				local last_v = nil
 				library.signals[1 + #library.signals] = toggleButton.MouseButton1Click:Connect(function()
 					if not library.colorpicker and not submenuOpen and not lockedup then
 						local newval = not library.flags[flagName]
@@ -1889,7 +1999,6 @@ function library:CreateWindow(options, ...)
 						ImageColor3 = darkenColor(library.colors.main, 2.5)
 					}):Play()
 				end
-				local default = not not library.flags[flagName]
 				local function Update()
 					toggleName, callback = options.Name or toggleName, options.Callback
 					local boolstatus = library.flags[flagName]
@@ -1912,6 +2021,15 @@ function library:CreateWindow(options, ...)
 					toggleHeadline.Text = toggleName or "???"
 					return boolstatus
 				end
+				if alreadyEnabled ~= nil then
+					Set(alreadyEnabled)
+				else
+					library.flags[flagName] = not not alreadyEnabled
+					if options.Location then
+						options.Location[options.LocationFlag or flagName] = not not alreadyEnabled
+					end
+				end
+				local default = not not library.flags[flagName]
 				Update()
 				if kbUpdate then
 					kbUpdate()
@@ -2296,6 +2414,9 @@ function library:CreateWindow(options, ...)
 					library.unnamedtextboxes = 1 + (library.unnamedtextboxes or 0)
 					return "Textbox" .. tostring(library.unnamedtextboxes)
 				end)()
+				if elements[flagName] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
+				end
 				local requiredtype = options.Type
 				local newTextbox = Instance_new("Frame")
 				local textbox = Instance_new("ImageLabel")
@@ -2549,6 +2670,9 @@ function library:CreateWindow(options, ...)
 					library.unnamedkeybinds = 1 + (library.unnamedkeybinds or 0)
 					return "Keybind" .. tostring(library.unnamedkeybinds)
 				end)()
+				if elements[flag] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flag .. "'", 3))
+				end
 				library.keyHandler = keyHandler
 				local keyHandler = options.KeyNames or keyHandler
 				local newKeybind = Instance_new("Frame")
@@ -2798,6 +2922,9 @@ function library:CreateWindow(options, ...)
 					library.unnamedlabels = 1 + (library.unnamedlabels or 0)
 					return "Label" .. tostring(library.unnamedlabels)
 				end)()
+				if elements[flag] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flag .. "'", 3))
+				end
 				local newLabel = Instance_new("Frame")
 				local labelHeadline = Instance_new("TextLabel")
 				local labelPositioner = Instance_new("Frame")
@@ -2867,6 +2994,9 @@ function library:CreateWindow(options, ...)
 					library.unnamedsliders = 1 + (library.unnamedsliders or 0)
 					return "Slider" .. tostring(library.unnamedsliders)
 				end)()
+				if elements[flagName] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
+				end
 				local decimalprecision = tonumber(options.Decimals or options.Precision or options.Precise)
 				if not decimalprecision and options.Max - options.Min <= 1 then
 					decimalprecision = 1
@@ -3267,6 +3397,9 @@ function library:CreateWindow(options, ...)
 					library.unnamedsearchbox = 1 + (library.unnamedsearchbox or 0)
 					return "SearchBox" .. tostring(library.unnamedsearchbox)
 				end)()
+				if elements[flagName] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
+				end
 				local newDropdown = Instance_new("Frame")
 				local dropdown = Instance_new("ImageLabel")
 				local dropdownInner = Instance_new("ImageLabel")
@@ -3897,6 +4030,9 @@ function library:CreateWindow(options, ...)
 						library.unnamedpersistence = 1 + (library.unnamedpersistence or 0)
 						return "Persistence" .. tostring(library.unnamedpersistence)
 					end)()
+					if elements[flagName] ~= nil then
+						warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
+					end
 					local designerpersists = options.Desginer
 					local newDropdown = Instance_new("Frame")
 					local dropdown = Instance_new("ImageLabel")
@@ -3913,7 +4049,7 @@ function library:CreateWindow(options, ...)
 						makefolder("./Pepsi Lib")
 					end
 					local common_string = "./Pepsi Lib/" .. tostring(custom_workspace or library.WorkspaceName)
-					local function resolvelist()
+					local function resolvelist(nofold)
 						if custom_workspace ~= options.Workspace then
 							custom_workspace = options.Workspace
 							common_string = "./Pepsi Lib/" .. tostring(custom_workspace or library.WorkspaceName)
@@ -3922,6 +4058,9 @@ function library:CreateWindow(options, ...)
 							return {}
 						end
 						if not isfolder(common_string) then
+							if nofold then
+								return {}
+							end
 							makefolder(common_string)
 						end
 						assert(isfolder(common_string), "Couldn't create folder: " .. tostring(library.WorkspaceName or "No workspace name?"))
@@ -3935,7 +4074,7 @@ function library:CreateWindow(options, ...)
 						end
 						return names
 					end
-					local list = resolvelist()
+					local list = resolvelist(true)
 					local blankstring = options.BlankValue or options.NoValueString or options.Nothing
 					local selectedObjects = {}
 					local optionCount = 0
@@ -4230,7 +4369,7 @@ function library:CreateWindow(options, ...)
 					local function display(dropdownEnabled, f)
 						if submenuOpen == dropdown or submenuOpen == nil then
 							if dropdownEnabled then
-								list = resolvelist()
+								list = resolvelist(true)
 								AddOptions(list, f)
 								submenuOpen = dropdown
 								restorezindex[newSection] = restorezindex[newSection] or newSection.ZIndex
@@ -4416,6 +4555,9 @@ function library:CreateWindow(options, ...)
 						local good, content = JSONEncode(saving)
 						if good and content then
 							if not get then
+								if not isfolder(common_string) then
+									makefolder(common_string)
+								end
 								writefile(rawfile, content)
 							else
 								ret = content
@@ -4435,7 +4577,7 @@ function library:CreateWindow(options, ...)
 						end
 						local filename = "json__load"
 						if not jsonmode then
-							local filenameddst = string.gsub(s or dropdownSelection.Text, "%W", "")
+							local filenameddst = convertfilename(s or dropdownSelection.Text, nil, "")
 							if #filenameddst == 0 then
 								return
 							end
@@ -4444,7 +4586,7 @@ function library:CreateWindow(options, ...)
 						if loadcallback then
 							local x, e = pcall(loadcallback, (jsonmode and s) or filename, library.flags[flagName])
 							if not x and e then
-								warn("Error while calling the Pre-Load callback:", e, "\n" .. debug.traceback())
+								warn("Error while calling the Pre-Load callback:", e, debug.traceback("\n"))
 							end
 						end
 						if jsonmode or not isfile or isfile(filename) then
@@ -4672,6 +4814,9 @@ function library:CreateWindow(options, ...)
 					library.unnameddropdown = 1 + (library.unnameddropdown or 0)
 					return "Dropdown" .. tostring(library.unnameddropdown)
 				end)()
+				if elements[flagName] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
+				end
 				local newDropdown = Instance_new("Frame")
 				local dropdown = Instance_new("ImageLabel")
 				local dropdownInner = Instance_new("ImageLabel")
@@ -5286,6 +5431,9 @@ function library:CreateWindow(options, ...)
 					library.unnamedcolorpicker = 1 + (library.unnamedcolorpicker or 0)
 					return "Colorpicker" .. tostring(library.unnamedcolorpicker)
 				end)()
+				if elements[flagName] ~= nil then
+					warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
+				end
 				local designers = options.__designer
 				options.__designer = nil
 				local rainbowColorMode = false
@@ -5382,6 +5530,33 @@ function library:CreateWindow(options, ...)
 				colorPickerButton.BorderColor3 = library.colors.elementBorder
 				local colored_colorPickerButton_BorderColor3 = {colorPickerButton, "BorderColor3", "elementBorder"}
 				colored[1 + #colored] = colored_colorPickerButton_BorderColor3
+				local function UpdateColorPicker(force, rainbsow)
+					local last_vv = library.flags[flagName]
+					local newColor = force or Color3.fromHSV(colorH, colorS, colorV)
+					if not force then
+						colorH, colorS, colorV = newColor:ToHSV()
+					end
+					colorPickerInner.BackgroundColor3 = darkenColor(newColor, 1.5)
+					colorPickerInner.ImageColor3 = darkenColor(newColor, 2.5)
+					color.BackgroundColor3 = Color3.fromHSV(colorH, 1, 1)
+					library.flags[flagName] = newColor
+					if options.Location then
+						options.Location[options.LocationFlag or flagName] = newColor
+					end
+					hexInputBox.Text = Color3ToHex(newColor)
+					if force then
+						color.BackgroundColor3 = force
+						selectorColor.Position = UDim2.new(force and select(3, Color3.toHSV(force)))
+					end
+					local pos = 1 - (Color3.toHSV(newColor))
+					local scalex = selectorHue.Position.X.Scale
+					if scalex ~= pos and not ((pos == 0 or pos == 1) and (scalex == 1 or scalex == 0)) then
+						selectorHue.Position = UDim2.new(pos)
+					end
+					if callback and last_vv ~= newColor then
+						task.spawn(callback, newColor, last_vv, rainbsow)
+					end
+				end
 				library.signals[1 + #library.signals] = colorPickerButton.MouseButton1Click:Connect(function()
 					if submenuOpen == colorPicker or submenuOpen == nil then
 						colorPickerEnabled = not colorPickerEnabled
@@ -5396,6 +5571,10 @@ function library:CreateWindow(options, ...)
 							newSection.ZIndex = 100 + newSection.ZIndex
 							colorPickerButton.BorderColor3 = library.colors.main
 							colored_colorPickerButton_BorderColor3[3] = "main"
+							print(library.flags[flagName]:ToHSV())
+							print(colorH, colorS, colorV)
+							print(Color3.fromHSV(colorH, colorS, colorV))
+							UpdateColorPicker()
 						else
 							for _, v in next, colorpickerconflicts do
 								v.Visible = true
@@ -5580,33 +5759,6 @@ function library:CreateWindow(options, ...)
 				rainbowButton.Size = UDim2.fromScale(1, 1)
 				rainbowButton.ZIndex = 5
 				rainbowButton.Image = "rbxassetid://7484772919"
-				local function UpdateColorPicker(force, rainbsow)
-					local last_vv = library.flags[flagName]
-					local newColor = force or Color3.fromHSV(colorH, colorS, colorV)
-					if not force then
-						colorH, colorS, colorV = newColor:ToHSV()
-					end
-					colorPickerInner.BackgroundColor3 = darkenColor(newColor, 1.5)
-					colorPickerInner.ImageColor3 = darkenColor(newColor, 2.5)
-					color.BackgroundColor3 = Color3.fromHSV(colorH, 1, 1)
-					library.flags[flagName] = newColor
-					if options.Location then
-						options.Location[options.LocationFlag or flagName] = newColor
-					end
-					hexInputBox.Text = Color3ToHex(newColor)
-					if force then
-						color.BackgroundColor3 = force
-						selectorColor.Position = UDim2.new(force and select(3, Color3.toHSV(force)))
-					end
-					local pos = 1 - (Color3.toHSV(newColor))
-					local scalex = selectorHue.Position.X.Scale
-					if scalex ~= pos and not ((pos == 0 or pos == 1) and (scalex == 1 or scalex == 0)) then
-						selectorHue.Position = UDim2.new(pos)
-					end
-					if callback and last_vv ~= newColor then
-						task.spawn(callback, newColor, last_vv, rainbsow)
-					end
-				end
 				local indexwith = (designers and "rainbows") or "rainbowsg"
 				local function setrainbow(t, rainbowColorMod)
 					if nil == rainbowColorMod and t ~= nil then
@@ -5704,11 +5856,8 @@ function library:CreateWindow(options, ...)
 				colorV = 1 - (math.clamp(selectorColor.AbsolutePosition.Y - color.AbsolutePosition.Y, 0, color.AbsoluteSize.Y) / color.AbsoluteSize.Y)
 				library.signals[1 + #library.signals] = color.InputBegan:Connect(function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-						if colorInput then
-							colorInput:Disconnect()
-						end
 						isDraggingSomething = true
-						colorInput = runService.RenderStepped:Connect(function()
+						colorInput = (colorInput and colorInput:Disconnect() and nil) or runService.RenderStepped:Connect(function()
 							local colorX = (math.clamp(mouse.X - color.AbsolutePosition.X, 0, color.AbsoluteSize.X) / color.AbsoluteSize.X)
 							local colorY = (math.clamp(mouse.Y - color.AbsolutePosition.Y, 0, color.AbsoluteSize.Y) / color.AbsoluteSize.Y)
 							selectorColor.Position = UDim2.fromScale(colorX, colorY)
@@ -5743,11 +5892,9 @@ function library:CreateWindow(options, ...)
 					end
 				end)
 				library.signals[1 + #library.signals] = hue.InputEnded:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-						if hueInput then
-							isDraggingSomething = false
-							hueInput:Disconnect()
-						end
+					if hueInput and input.UserInputType == Enum.UserInputType.MouseButton1 then
+						isDraggingSomething = false
+						hueInput:Disconnect()
 					end
 				end)
 				if rainbowColorMode then
@@ -5922,7 +6069,7 @@ function library:CreateWindow(options, ...)
 		})
 		local designerelements = {}
 		library.designerelements = designerelements
-		for _, v in next, {{"Main", "main"}, {"Background", "background"}, {"Outer Border", "outerBorder"}, {"Inner Border", "innerBorder"}, {"Top Gradient", "topGradient"}, {"Bottom Gradient", "bottomGradient"}, {"Section Background", "sectionBackground"}, {"Section", "section"}, {"Element Text", "elementText"}, {"Other Element Text", "otherElementText"}, {"Element Border", "elementBorder"}, {"Selected Option", "selectedOption"}, {"Unselected Option", "unselectedOption"}, {"Hovered Option Top", "hoveredOptionTop"}, {"Unhovered Option Top", "unhoveredOptionTop"}, {"Hovered Option Bottom", "hoveredOptionBottom"}, {"Unhovered Option Bottom", "unhoveredOptionBottom"}} do
+		for _, v in next, {{"Main", "main"}, {"Background", "background"}, {"Outer Border", "outerBorder"}, {"Inner Border", "innerBorder"}, {"Top Gradient", "topGradient"}, {"Bottom Gradient", "bottomGradient"}, {"Section Background", "sectionBackground"}, {"Section", "section"}, {"Element Text", "elementText"}, {"Other Element Text", "otherElementText"}, {"Tab Text", "tabText"}, {"Element Border", "elementBorder"}, {"Selected Option", "selectedOption"}, {"Unselected Option", "unselectedOption"}, {"Hovered Option Top", "hoveredOptionTop"}, {"Unhovered Option Top", "unhoveredOptionTop"}, {"Hovered Option Bottom", "hoveredOptionBottom"}, {"Unhovered Option Bottom", "unhoveredOptionBottom"}} do
 			local nam, codename = v[1], v[2]
 			local cflag = "__Designer.Colors." .. codename
 			designerelements[codename] = {
@@ -5992,16 +6139,7 @@ function library:CreateWindow(options, ...)
 			Callback = library.unload
 		}, {
 			Name = "Reset GUI",
-			Callback = function()
-				destroyrainbowsg = true
-				pcall(function()
-					for k, v in next, elements do
-						if v and k and v.Set and v.Default ~= nil and library.flags[k] ~= v.Default and string.sub(k, 1, 11) ~= "__Designer." then
-							v:Set(v.Default)
-						end
-					end
-				end)
-			end
+			Callback = resetall
 		}, {
 			Name = "Reset Designer",
 			Callback = function()
@@ -6024,7 +6162,7 @@ function library:CreateWindow(options, ...)
 				lasthidebing = os.clock()
 			end
 		}}, {"AddLabel", "__Designer.Label.Version", settingssection, {
-			Name = "Version: " .. tostring(library.Version or "?")
+			Name = "Library Version: " .. tostring(library.Version or "?")
 		}}}
 		if setclipboard and daaata[8] then
 			local common_table = daaata[8][4]
@@ -6202,7 +6340,7 @@ function library:CreateWindow(options, ...)
 			windowFunctions:CreateDesigner((type(whatDoILookLike) == "table" and whatDoILookLike) or nil)
 			if options.DefaultTheme or options.Theme then
 				spawn(function()
-					local content = options.DefaultTheme or options.Theme
+					local content = options.DefaultTheme or options.Theme or options.JSON or options.ThemeJSON
 					if content and type(content) == "string" and #content > 1 then
 						local good, jcontent = JSONDecode(content)
 						if good and jcontent then
@@ -6228,4 +6366,4 @@ end
 library.AddWindow = library.CreateWindow
 library.Window = library.CreateWindow
 library.W = library.CreateWindow
-return library
+return
