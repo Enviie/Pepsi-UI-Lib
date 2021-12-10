@@ -875,11 +875,12 @@ function library.unload()
 	warn("Unloaded")
 end
 library.Unload = library.unload
-local Instance_new = (syn and syn.protect_gui and function(...)
+local ProtectGUI = (syn and syn.protect_gui) or (identifyexecutor() == "ScriptWare" and gethui)
+local Instance_new = (ProtectGUI and function(...)
 	local x = {Instance.new(...)}
 	if x[1] then
 		library.objects[1 + #library.objects] = x[1]
-		pcall(syn.protect_gui, x[1])
+		pcall(ProtectGUI, x[1])
 	end
 	return unpack(x)
 end) or function(...)
