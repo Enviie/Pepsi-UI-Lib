@@ -598,7 +598,7 @@ local function resolveid(image, flag)
 		local succezz = pcall(function()
 			local typ = type(image)
 			if typ == "string" then
-				local getasset = (syn and getsynasset) or (identifyexecutor() == "ScriptWare" and getcustomasset)
+				local getasset = getsynasset
 				if getasset then
 					if #image > 11 and string.sub(image, 1, 11) == "synasset://" then
 						return getasset(string.sub(image, 12))
@@ -875,7 +875,7 @@ function library.unload()
 	warn("Unloaded")
 end
 library.Unload = library.unload
-local ProtectGUI = (syn and syn.protect_gui) or (identifyexecutor() == "ScriptWare" and gethui)
+local ProtectGUI = syn.protect_gui
 local Instance_new = (ProtectGUI and function(...)
 	local x = {Instance.new(...)}
 	if x[1] then
